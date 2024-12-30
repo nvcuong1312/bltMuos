@@ -1,0 +1,2 @@
+local love = require("love")
+
