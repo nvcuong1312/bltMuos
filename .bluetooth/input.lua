@@ -64,7 +64,7 @@ function input.onClick(callBack)
     if key ~= "" then
         callBack(key)
         key = ""
-    end 
+    end
 end
 
 return input
