@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# ICON: bluetooth
 . /opt/muos/script/var/func.sh
 
 if pgrep -f "playbgm.sh" >/dev/null; then
