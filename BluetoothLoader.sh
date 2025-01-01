@@ -1,7 +1,5 @@
 #!/bin/sh
 
-. /opt/muos/script/var/func.sh
-
 if [ -d "BluetoothData" ]; then
   rm -r "BluetoothData"
 fi
@@ -31,9 +29,23 @@ echo "|Author     : CuongNV             |"
 echo "|Complete!                        |"
 echo "|Thanks!                          |"
 echo "-----------------------------------"
-sleep 5
+sleep 3
 
-if [ -e "mnt/mmc/MUOS/init/bluetooth.sh" ]; then
-    mv "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.sh" "mnt/mmc/init/bluetooth.sh"
-	SET_VAR "global" "settings/advanced/user_init" "1"
-fi 
+# Check Init
+is_reboot=false
+if [ "$(cat /run/muos/global/settings/advanced/user_init)" != "1" ]; then
+	echo "1" >"/run/muos/global/settings/advanced/user_init"
+	is_reboot=true
+fi
+
+if [ ! -f "mnt/mmc/MUOS/init/bluetooth.sh" ]; then
+    mv "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.sh" "mnt/mmc/MUOS/init/bluetooth.sh"
+	is_reboot=true
+fi
+
+if $is_reboot; then
+    sleep 1
+	echo "Restarting OS ..."
+	sleep 2
+	reboot
+fi
