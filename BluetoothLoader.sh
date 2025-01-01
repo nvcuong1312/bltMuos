@@ -17,8 +17,14 @@ if [ -e "mnt/mmc/MUOS/application/Bluetooth.sh" ]; then
     rm -r "mnt/mmc/MUOS/application/Bluetooth.sh"
 fi
 
+if [ -e "opt/muos/theme/glyph/muxapp/bluetooth.png" ]; then
+    rm -r "opt/muos/theme/glyph/muxapp/bluetooth.png"
+fi
+
 mv "BluetoothData/UnzipData/bltMuos-main/.bluetooth" "mnt/mmc/MUOS/application/"
 mv "BluetoothData/UnzipData/bltMuos-main/Bluetooth.sh" "mnt/mmc/MUOS/application/Bluetooth.sh"
+mv "BluetoothData/UnzipData/bltMuos-main/opt/muos/theme/glyph/muxapp/bluetooth.png" "opt/muos/theme/glyph/muxapp/bluetooth.png"
+
 
 echo "-----------------------------------"
 echo "|Author     : CuongNV             |"
