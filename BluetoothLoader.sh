@@ -21,7 +21,7 @@ fi
 
 mv "BluetoothData/UnzipData/bltMuos-main/.bluetooth" "mnt/mmc/MUOS/application/"
 mv "BluetoothData/UnzipData/bltMuos-main/Bluetooth.sh" "mnt/mmc/MUOS/application/Bluetooth.sh"
-mv "BluetoothData/UnzipData/bltMuos-main/opt/muos/theme/glyph/muxapp/bluetooth.png" "opt/muos/theme/glyph/muxapp/bluetooth.png"
+mv "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "opt/muos/theme/glyph/muxapp/bluetooth.png"
 
 
 echo "-----------------------------------"
