@@ -218,7 +218,9 @@ function TurnOffBluetooth()
 end
 
 function OnKeyPress(key)
-    bottomEvent(key)
+    if bottomEvent then
+        bottomEvent(key)
+    end
 
     if key == "left" or key == "right" then
         isAvailableDevicesSelected = not isAvailableDevicesSelected
