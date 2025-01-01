@@ -15,14 +15,13 @@ if [ -e "mnt/mmc/MUOS/application/Bluetooth.sh" ]; then
     rm -r "mnt/mmc/MUOS/application/Bluetooth.sh"
 fi
 
-if [ -e "opt/muos/theme/glyph/muxapp/bluetooth.png" ]; then
-    rm -r "opt/muos/theme/glyph/muxapp/bluetooth.png"
+if [ -e "mnt/mmc/MUOS/theme/active/glyph/muxapp/bluetooth.png" ]; then
+    rm -r "mnt/mmc/MUOS/theme/active/glyph/muxapp/bluetooth.png"
 fi
 
 mv "BluetoothData/UnzipData/bltMuos-main/.bluetooth" "mnt/mmc/MUOS/application/"
 mv "BluetoothData/UnzipData/bltMuos-main/Bluetooth.sh" "mnt/mmc/MUOS/application/Bluetooth.sh"
-mv "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "opt/muos/theme/glyph/muxapp/bluetooth.png"
-
+mv "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "mnt/mmc/MUOS/theme/active/glyph/muxapp/bluetooth.png"
 
 echo "-----------------------------------"
 echo "|Author     : CuongNV             |"
@@ -46,6 +45,5 @@ fi
 if $is_reboot; then
 	echo "Restarting OS ..."
 	sleep 2
-
 	/opt/muos/script/mux/quit.sh reboot frontend
 fi
