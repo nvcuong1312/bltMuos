@@ -1,18 +1,10 @@
 local love = require("love")
-local input = {}
 
-local joystick
+local input = {}
 local key = ""
+local joystick
 
 function input.load()
-    -- love.graphics.setFullscreen(true)
-    -- ScanDevices(5)
-
-    -- local devices = GetDevices()
-    -- for _, device in ipairs(devices) do
-    --     print("IP: " .. device.ip .. ", Name: " .. device.name)
-    -- end
-    -- Initialize joystick
     local joysticks = love.joystick.getJoysticks()
     if #joysticks > 0 then
         joystick = joysticks[1]
@@ -52,19 +44,23 @@ function input.update(dt)
             key = "start"
         end
         if joystick:isGamepadDown("leftshoulder") then
-            key = "leftshoulder"
+            key = "l1"
         end
         if joystick:isGamepadDown("rightshoulder") then
-            key = "rightshoulder"
+            key = "r1"
         end
     end
 end
 
+local lastTime = 0
 function input.onClick(callBack)
-    if key ~= "" then
+    local currentTime = love.timer.getTime()
+    if currentTime - lastTime > 0.2 and key ~= "" then
         callBack(key)
-        key = ""
+        lastTime = currentTime
     end
+
+    key = ""
 end
 
 return input

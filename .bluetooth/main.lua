@@ -1,8 +1,8 @@
 local love = require("love")
+local socket = require("socket")
+
 local Config = require("config")
 local Bluetooth = require("bluetooth")
-
-local textblock = require("textblock")
 
 local input = require("input")
 
@@ -12,7 +12,17 @@ local SCREEN_GRID = 3
 
 local currScreen = SCREEN_MAIN
 
-local keyPress = ""
+local msgLog = ""
+
+local isBluetoothOn = false
+
+local isAvailableDevicesSelected = false
+
+local idxAvailableDevices = 1
+local availableDevices = {}
+
+local idxConnectedDevice = 1
+local connectedDevices = {}
 
 function love.load()
     -- love.graphics.setFullscreen(true)
@@ -29,68 +39,227 @@ function love.load()
     local height = love.graphics.getHeight()
     local width = love.graphics.getWidth()
     input.load()
-    print("height: " .. height .. " width: " .. width)
+    isBluetoothOn = Bluetooth.IsPowerOn()
+
+    if isBluetoothOn then
+        LoadConnectedDevices()
+    end
 end
 
 function love.draw()
-    BottomButton()
-    ConnectedDevices()
-    ScanDevices()
+    if isBluetoothOn then
+        AvailableDevicesUI()
+        ConnectedDevicesUI()
+    else
+        love.graphics.print("Press [R1] to Power On Bluetooth", 200, 200)
+    end
 
-    love.graphics.print(keyPress, 100, 100)
+    BottomButtonUI()
+
+    -- Log MSG
+    love.graphics.rectangle("line", 370, 430, 260, 40)
+    love.graphics.print(msgLog, 380, 442)
 end
 
-function ConnectedDevices()
+function AvailableDevicesUI()
     -- UI
-    love.graphics.rectangle("line", 10, 10, 300, 400)
-    love.graphics.print("Connected Devices", 10 + 10, 20)
+    local xPos = 10;
+    local yPos = 10
+    love.graphics.rectangle("line", xPos, yPos, 300, 400)
+    love.graphics.print("Available Devices:", xPos + 10, yPos + 10)
+
+    local iPos = 0
+    local lineHeight = 15
+    love.graphics.print("MAC", xPos + 10, yPos + 30)
+    love.graphics.print("Name", xPos + 150, yPos + 30)
+
+    for _, device in ipairs(availableDevices) do
+        if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
+            love.graphics.setColor(1.4,1.4,0.4)
+        else
+            love.graphics.setColor(1,1,1)
+        end
+
+        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 50)
+        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 50)
+        iPos = iPos + 1
+    end
+
+    love.graphics.setColor(1,1,1)
 end
 
-function ScanDevices()
+function ConnectedDevicesUI()
     -- UI
-    love.graphics.rectangle("line", 330, 10, 300, 400)
-    love.graphics.print("Scan Devices", 330 + 10, 20)
+    local xPos = 330;
+    local yPos = 10
+    love.graphics.rectangle("line", xPos, yPos, 300, 400)
+    love.graphics.print("Connected Devices:", xPos + 10, yPos + 10)
+
+    local iPos = 0
+    local lineHeight = 15
+    love.graphics.print("MAC", xPos + 10, yPos + 30)
+    love.graphics.print("Name", xPos + 150, yPos + 30)
+    for _, device in ipairs(connectedDevices) do
+        if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
+            love.graphics.setColor(1.4,1.4,0.4)
+        else
+            love.graphics.setColor(1,1,1)
+        end
+
+        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 50)
+        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 50)
+        iPos = iPos + 1
+    end
+
+    love.graphics.setColor(1,1,1)
 end
 
 local bottomEvent
-function BottomButton()
+function BottomButtonUI()
     -- UI
-    love.graphics.print("Start: PowerOn Bluetooth", 10, 430)
-    love.graphics.print("Select: PowerOf Bluetooth", 10, 450)
-    love.graphics.print("Y: Scan", 200, 430)
-    love.graphics.print("A: Connect", 200, 450)
-    love.graphics.print("B: Disconnect", 300, 430)
-    love.graphics.print("X: Delete", 300, 450)
+    if isBluetoothOn then
+        love.graphics.print("[Y]: Scan", 10, 430)
+        love.graphics.print("[A]: Connect", 100, 430)
+        love.graphics.print("[B]: Disconnect", 100, 450)
+        -- love.graphics.print("[X]: Remove", 100, 450)
+        love.graphics.print("[L1]: PowerOff Bluetooth", 200, 430)
+        love.graphics.print("[Select+Start]: Quit", 200, 450)
+    else
+        love.graphics.print("[R1]: PowerOn Bluetooth", 200, 430)
+    end
 
     -- Event
     bottomEvent = function(key)
-        if key == "a" then
-            -- Connect
-        elseif key == "b" then
-            -- Disconnect
-        elseif key == "x" then
-            -- Delete
-        elseif key == "y" then
-            -- Scan
-        elseif key == "select" then
-            -- PowerOf
-        elseif key == "start" then
-            -- PowerOn
+        if isBluetoothOn then
+            if key == "a" then
+                -- Connect
+                ConnectDevice()
+            elseif key == "b" then
+                -- Disconnect-7
+                DisconnectDevice()
+            elseif key == "x" then
+                -- Delete
+            elseif key == "y" then
+                -- Scan
+                LoadAvailableDevices()
+                LoadConnectedDevices()
+            elseif key == "l1" then
+                -- PowerOff
+                TurnOffBluetooth()
+            end
+        else
+            if key == "r1" then
+                -- PowerOn
+                TurnOnBluetooth()
+            end
         end
     end
 end
 
-function callBackOnclick(key)
+function ConnectDevice()
+    if table.getn(availableDevices) < 1 then
+        return
+    end
+
+    if isAvailableDevicesSelected then
+        local MAC = availableDevices[idxAvailableDevices].ip
+        Bluetooth.Connect(MAC)
+        connectedDevices = Bluetooth.GetConnectedDevices()
+        msgLog = "Connected: " .. MAC
+    else
+        msgLog = "TODO: Something..."
+    end
+end
+
+function DisconnectDevice()
+    if isAvailableDevicesSelected then
+        return
+    end
+
+    if table.getn(connectedDevices) < 1 then
+        return
+    end
+
+    local MAC = connectedDevices[idxConnectedDevice].ip
+    Bluetooth.Disconnect(MAC)
+    connectedDevices = Bluetooth.GetConnectedDevices()
+    msgLog = "Disconnected: " .. MAC
+    idxConnectedDevice = 0
+end
+
+function LoadAvailableDevices()
+    Bluetooth.ScanDevices(5)
+    availableDevices = Bluetooth.GetAvailableDevices()
+    msgLog = "Scanning complete!!!"
+end
+
+function LoadConnectedDevices()
+    connectedDevices = Bluetooth.GetConnectedDevices()
+end
+
+function TurnOnBluetooth()
+    Bluetooth.PowerOn()
+    isBluetoothOn = Bluetooth.IsPowerOn()
+    if isBluetoothOn then
+        msgLog = "Bluetooth: Started"
+    else
+        msgLog = "Bluetooth: Started Failed"
+    end
+end
+
+function TurnOffBluetooth()
+    Bluetooth.PowerOff()
+    isBluetoothOn = Bluetooth.IsPowerOn()
+    if isBluetoothOn == false then
+        msgLog = "Bluetooth: Stopped"
+    else
+        msgLog = "Bluetooth: Stopped Failed"
+    end
+end
+
+function OnKeyPress(key)
     bottomEvent(key)
+
+    if key == "left" or key == "right" then
+        isAvailableDevicesSelected = not isAvailableDevicesSelected
+        idxAvailableDevices = 1
+        idxConnectedDevice = 1
+    elseif key == "up" then
+        if isAvailableDevicesSelected then
+            if idxAvailableDevices > 1 then
+                idxAvailableDevices = idxAvailableDevices - 1
+            else
+                idxAvailableDevices = table.getn(availableDevices)
+            end
+        else
+            if idxConnectedDevice > 1 then
+                idxConnectedDevice = idxConnectedDevice - 1
+            else
+                idxConnectedDevice = table.getn(connectedDevices)
+            end
+        end
+    elseif key == "down" then
+        if isAvailableDevicesSelected then
+            if idxAvailableDevices < table.getn(availableDevices) then
+                idxAvailableDevices = idxAvailableDevices + 1
+            else
+                idxAvailableDevices = 1
+            end
+        else
+            if idxConnectedDevice < table.getn(connectedDevices) then
+                idxConnectedDevice = idxConnectedDevice + 1
+            else
+                idxConnectedDevice = 1
+            end
+        end
+    end
 end
 
 function love.update(dt)
     input.update(dt)
-    input.onClick(callBackOnclick)
+    input.onClick(OnKeyPress)
 end
 
--- function love.keypressed(key)
---     bottomEvent("a")
---     keyPress = "a"
---     -- love.graphics.print("key", 100, 100)
--- end
+function love.keypressed(key)
+    OnKeyPress(key)
+end
