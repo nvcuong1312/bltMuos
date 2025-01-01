@@ -28,7 +28,7 @@ sleep 3
 # Check Init
 is_reboot=false
 if [ "$(cat /run/muos/global/settings/advanced/user_init)" != "1" ]; then
-	echo "1" >"/run/muos/global/settings/advanced/user_init"
+	echo "1" > "/run/muos/global/settings/advanced/user_init"
 	is_reboot=true
 fi
 
@@ -38,8 +38,7 @@ if [ ! -f "mnt/mmc/MUOS/init/bluetooth.sh" ]; then
 fi
 
 if $is_reboot; then
-    sleep 1
 	echo "Restarting OS ..."
 	sleep 2
-	reboot
+	/opt/muos/script/mux/quit.sh reboot frontend
 fi
