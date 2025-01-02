@@ -119,7 +119,7 @@ function BottomButtonUI()
                 -- Connect
                 ConnectDevice()
             elseif key == "x" then
-                -- Disconnect-7
+                -- Disconnect
                 DisconnectDevice()
             elseif key == "b" then
                 -- Delete
@@ -204,8 +204,8 @@ function DisconnectDevice()
         Bluetooth.Disconnect(MAC)
         connectedDevices = Bluetooth.GetConnectedDevices()
         msgLog = "Disconnected: " .. MAC
-        idxConnectedDevice = 0
-        idxAvailableDevices = 0
+        idxConnectedDevice = 1
+        idxAvailableDevices = 1
         isAvailableDevicesSelected = not table.getn(connectedDevices) == 0
     end
 end
@@ -357,3 +357,18 @@ function love.gamepadpressed(joystick, button)
 
     OnKeyPress(key)
  end
+
+function round_rectangle(x, y, width, height, radius)
+	--RECTANGLES
+	love.graphics.rectangle("fill", x + radius, y + radius, width - (radius * 2), height - radius * 2)
+	love.graphics.rectangle("fill", x + radius, y, width - (radius * 2), radius)
+	love.graphics.rectangle("fill", x + radius, y + height - radius, width - (radius * 2), radius)
+	love.graphics.rectangle("fill", x, y + radius, radius, height - (radius * 2))
+	love.graphics.rectangle("fill", x + (width - radius), y + radius, radius, height - (radius * 2))
+	
+	--ARCS
+	love.graphics.arc("fill", x + radius, y + radius, radius, math.rad(-180), math.rad(-90))
+	love.graphics.arc("fill", x + width - radius , y + radius, radius, math.rad(-90), math.rad(0))
+	love.graphics.arc("fill", x + radius, y + height - radius, radius, math.rad(-180), math.rad(-270))
+	love.graphics.arc("fill", x + width - radius , y + height - radius, radius, math.rad(0), math.rad(90))
+end

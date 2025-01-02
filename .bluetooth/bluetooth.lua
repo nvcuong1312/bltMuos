@@ -99,18 +99,16 @@ end
 
 function Bluetooth.Disconnect(deviceMAC)
     os.execute("bluetoothctl remove " .. deviceMAC)
-    socket.sleep(2)
 end
 
 function Bluetooth.Connect(deviceMAC)
-    os.execute("bluetoothctl trust " .. deviceMAC)
-    os.execute("bluetoothctl connect " .. deviceMAC)
-    socket.sleep(5)
+    os.execute("bluetoothctl trust " .. deviceMAC .. " > " .. Config.BLUETOOTH_TRUST_PATH)
+    os.execute("bluetoothctl pair " .. deviceMAC .. " > " .. Config.BLUETOOTH_PAIR_PATH)
+    os.execute("bluetoothctl connect " .. deviceMAC .. " > " .. Config.BLUETOOTH_CONNECT_PATH)
 end
 
 function Bluetooth.Pair(deviceMAC)
     os.execute("bluetoothctl pair " .. deviceMAC)
-    socket.sleep(5)
 end
 
 return Bluetooth
