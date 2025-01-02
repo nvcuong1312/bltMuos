@@ -151,7 +151,7 @@ function ConnectedDevicesUI()
     end
 
     love.graphics.rectangle("fill", xPos, yPos, width, 30)
-    
+
     love.graphics.setColor(1,1,1)
     love.graphics.print("Connected", xPos + 120, yPos + 7)
 
@@ -162,10 +162,10 @@ function ConnectedDevicesUI()
 
     love.graphics.setColor(0.169, 0.259, 0.212)
     love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
-    
+
     love.graphics.setColor(0.169, 0.259, 0.11)
     love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
-    
+
     love.graphics.setColor(1,1,1)
     love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
 
@@ -196,40 +196,44 @@ end
 function BottomButtonUI()
     local xPos = 10
     local yPos = 435
+
     -- UI
-    if isAvailableDevicesSelected then
-        love.graphics.setColor(1,1,1)
-        love.graphics.print("[A]: Connect", xPos, yPos)
-
-        love.graphics.setColor(1,1,1, 0.5)
-        love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
-    else
-        love.graphics.setColor(1,1,1, 0.5)
-        love.graphics.print("[A]: Connect", xPos, yPos)
-
-        love.graphics.setColor(1,1,1)
-        love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
-    end
-    
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
-    love.graphics.print("[Y]: Scan", xPos + 100, yPos)
-
     if isBluetoothOn then
         love.graphics.setColor(1,1,1)
         love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
+        love.graphics.print("[Y]: Scan", xPos + 100, yPos)
 
         love.graphics.setColor(1,1,1, 0.5)
         love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
+
+        love.graphics.setColor(1,1,1)
+        if isAvailableDevicesSelected then
+            love.graphics.setColor(1,1,1)
+            love.graphics.print("[A]: Connect", xPos, yPos)
+
+            love.graphics.setColor(1,1,1, 0.5)
+            love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+        else
+            love.graphics.setColor(1,1,1, 0.5)
+            love.graphics.print("[A]: Connect", xPos, yPos)
+
+            love.graphics.setColor(1,1,1)
+            love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+        end
     else
         love.graphics.setColor(1,1,1, 0.5)
         love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
+        love.graphics.print("[Y]: Scan", xPos + 100, yPos)
+        love.graphics.print("[A]: Connect", xPos, yPos)
+        love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
 
         love.graphics.setColor(1,1,1)
         love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
     end
-    
-    
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
+
 
     -- Event
     bottomEventFunc = function(key)
@@ -281,10 +285,10 @@ function ConnectDevice()
             local MAC = availableDevices[idxAvailableDevices].ip
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
-    
+
             local tempDevices = availableDevices
             availableDevices = {}
-            
+
             for _, device in ipairs(tempDevices) do
                 local isExits = false
                 for _, cDevice in ipairs(connectedDevices) do
@@ -297,13 +301,13 @@ function ConnectDevice()
                     table.insert(availableDevices, device)
                 end
             end
-    
+
             isAvailableDevicesSelected = table.getn(availableDevices) > 0
-    
+
             msgLog = "Connected: " .. MAC
         else
             msgLog = "TODO: Something..."
-        end 
+        end
     end
 end
 
@@ -363,7 +367,7 @@ function OnKeyPress(key)
     if bottomEventFunc then
         bottomEventFunc(key)
     end
-    
+
     if key == "left" or key == "right" then
         isAvailableDevicesSelected = not isAvailableDevicesSelected
         idxAvailableDevices = 1
