@@ -1,10 +1,10 @@
 local love = require("love")
 local socket = require("socket")
+
 local Config = require("config")
+local StringHelper = require("Helper/StringHelper")
 
 local Bluetooth = {}
-
-local isRunning = false
 
 local availableDevices = {}
 local connectedDevices = {}
@@ -26,45 +26,19 @@ function Bluetooth.IsPowerOn()
     return false
 end
 
-function Bluetooth.IsRunning()
-    return isRunning
-end
-
 function Bluetooth.PowerOn()
-    if isRunning then
-        return
-    end
-
-    isRunning = true
     os.execute("bluetoothctl power on")
-    isRunning = false
 end
 
 function Bluetooth.PowerOff()
-    if isRunning then
-        return
-    end
-
-    isRunning = true
-
     os.execute("bluetoothctl power off")
-
-    isRunning = false
 end
 
 function Bluetooth.ScanDevices(timeout)
-    if isRunning then
-        return
-    end
-
-    isRunning = true
-
     if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") ~= "1" then
         os.execute("bluetoothctl --timeout " .. timeout .." scan on");
         -- socket.sleep(timeout)
     end
-
-    isRunning = false
 end
 
 function Bluetooth.GetAvailableDevices()
@@ -78,9 +52,23 @@ function Bluetooth.GetAvailableDevices()
     local file = io.open(Config.AVAILABLE_DEVICES_PATH, "r")
     if file then
         for line in file:lines() do
-            local lineData = line:gsub("Device ", "")
-            local ip, name = lineData:match("([^%s]+)%s+(.*)")
-            table.insert(availableDevices, {ip = ip, name = name})
+            if string.find(line, "^Device") then
+                local lineData = line:gsub("Device ", "")
+                local ip, name = lineData:match("([^%s]+)%s+(.*)")
+                if StringHelper.IsMACAndNameValid(ip, name) then
+                    local cDevices = Bluetooth.GetConnectedDevices()
+                    local isExits = false
+                    for _, obj in ipairs(cDevices) do
+                        if obj.ip and string.find(obj.ip, ip, 1, true) then
+                            isExits = true
+                        end
+                    end
+
+                    if isExits == false then
+                        table.insert(availableDevices, {ip = ip, name = StringHelper.FormatStringToLarge(name, 17)})
+                    end
+                end
+            end
         end
     end
 
@@ -100,7 +88,9 @@ function Bluetooth.GetConnectedDevices()
         for line in file:lines() do
             local lineData = line:gsub("Device ", "")
             local ip, name = lineData:match("([^%s]+)%s+(.*)")
-            table.insert(connectedDevices, {ip = ip, name = name})
+            if StringHelper.IsMACAndNameValid(ip, name) then
+                table.insert(connectedDevices, {ip = ip, name = StringHelper.FormatStringToLarge(name, 17)})
+            end
         end
     end
 
