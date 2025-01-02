@@ -1,1 +1,4 @@
-![muOS_20250101_1433_0](https://github.com/user-attachments/assets/73ace485-5f4b-417a-bd76-ff892a2d4d6f)
+Bluetooth Setting for MUOS
+
+![muOS_20250102_1647_0](https://github.com/user-attachments/assets/d22649c2-38d7-4cb1-946d-989806913ee8)
+
