@@ -172,6 +172,7 @@ function ConnectedDevicesUI()
     love.graphics.setColor(1,1,1)
     love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
 
+
     for idx, device in ipairs(connectedDevices) do
         if idx > Config.GRID_PAGE_ITEM then
             goto continue
@@ -196,14 +197,39 @@ function BottomButtonUI()
     local xPos = 10
     local yPos = 435
     -- UI
-    love.graphics.print("[A]: Connect", xPos, yPos)
-    love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+    if isAvailableDevicesSelected then
+        love.graphics.setColor(1,1,1)
+        love.graphics.print("[A]: Connect", xPos, yPos)
 
-    love.graphics.print("[Y]: Scan", xPos + 100, yPos)
+        love.graphics.setColor(1,1,1, 0.5)
+        love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+    else
+        love.graphics.setColor(1,1,1, 0.5)
+        love.graphics.print("[A]: Connect", xPos, yPos)
+
+        love.graphics.setColor(1,1,1)
+        love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+    end
+    
+    love.graphics.setColor(1,1,1)
     love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
+    love.graphics.print("[Y]: Scan", xPos + 100, yPos)
 
-    love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
-    love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
+    if isBluetoothOn then
+        love.graphics.setColor(1,1,1)
+        love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
+
+        love.graphics.setColor(1,1,1, 0.5)
+        love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
+    else
+        love.graphics.setColor(1,1,1, 0.5)
+        love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
+
+        love.graphics.setColor(1,1,1)
+        love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
+    end
+    
+    
 
     -- Event
     bottomEventFunc = function(key)
