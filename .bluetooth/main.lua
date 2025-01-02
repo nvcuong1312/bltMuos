@@ -26,11 +26,15 @@ local timeRunConnectFunc = 0
 local runDisConnectFunc
 local timeRunDisConnectFunc = 0
 
+local ic_bluetooth
+
 function love.load()
     isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
         LoadConnectedDevices()
     end
+
+    ic_bluetooth = love.graphics.newImage("Assets/Icon/ic_bluetooth.png")
 end
 
 function love.draw()
@@ -62,6 +66,7 @@ function HeaderUI()
     love.graphics.setColor(0.98, 0.98, 0.749)
     local font = love.graphics.newFont(18)
     love.graphics.setFont(font)
+    love.graphics.draw(ic_bluetooth, 640 - 25, yPos + 4)
     love.graphics.print("Bluetooth Setting", xPos + 230, yPos + 5)
 
     Now = os.date('*t')
@@ -116,8 +121,8 @@ function AvailableDevicesUI()
         end
 
         if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
-            love.graphics.setColor(1.4,1.4,0.4)
-        else
+            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
+            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 65, width, 15)
             love.graphics.setColor(1,1,1)
         end
 
@@ -173,8 +178,8 @@ function ConnectedDevicesUI()
         end
 
         if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
-            love.graphics.setColor(1.4,1.4,0.4)
-        else
+            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
+            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 65, width, 15)
             love.graphics.setColor(1,1,1)
         end
 
@@ -188,16 +193,17 @@ function ConnectedDevicesUI()
 end
 
 function BottomButtonUI()
+    local xPos = 10
+    local yPos = 435
     -- UI
-    if isBluetoothOn then
-        love.graphics.print("[Y]: Scan", 10, 430)
-        love.graphics.print("[A]: Connect", 80, 430)
-        love.graphics.print("[X]: Disconnect", 80, 450)
-        love.graphics.print("[Select]: PowerOff Bluetooth", 180, 430)
-        love.graphics.print("[Menu]: Quit", 180, 450)
-    else
-        love.graphics.print("[Start]: PowerOn Bluetooth", 180, 430)
-    end
+    love.graphics.print("[A]: Connect", xPos, yPos)
+    love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+
+    love.graphics.print("[Y]: Scan", xPos + 100, yPos)
+    love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
+
+    love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
+    love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
 
     -- Event
     bottomEventFunc = function(key)
