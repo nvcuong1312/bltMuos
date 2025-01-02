@@ -1,16 +1,7 @@
 local love = require("love")
-local socket = require("socket")
 
-local Config = require("config")
 local Bluetooth = require("bluetooth")
-
 local input = require("input")
-
-local SCREEN_MAIN = 1
-local SCREEN_LOADING = 2
-local SCREEN_GRID = 3
-
-local currScreen = SCREEN_MAIN
 
 local msgLog = ""
 
@@ -24,23 +15,21 @@ local availableDevices = {}
 local idxConnectedDevice = 1
 local connectedDevices = {}
 
+local bottomEventFunc
+
+local runScanFunc
+local timeRunScanFunc = 0
+
+local runConnectFunc
+local timeRunConnectFunc = 0
+
+local runDisConnectFunc
+local timeRunDisConnectFunc = 0
+
 function love.load()
-    -- love.graphics.setFullscreen(true)
-    -- ScanDevices(5)
-
-    -- local devices = GetDevices()
-    -- for _, device in ipairs(devices) do
-    --     print("IP: " .. device.ip .. ", Name: " .. device.name)
-    -- end
-    -- Initialize joystick
-
-    currScreen = SCREEN_MAIN
-
-    local height = love.graphics.getHeight()
-    local width = love.graphics.getWidth()
     input.load()
-    isBluetoothOn = Bluetooth.IsPowerOn()
 
+    isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
         LoadConnectedDevices()
     end
@@ -114,7 +103,6 @@ function ConnectedDevicesUI()
     love.graphics.setColor(1,1,1)
 end
 
-local bottomEvent
 function BottomButtonUI()
     -- UI
     if isBluetoothOn then
@@ -129,7 +117,7 @@ function BottomButtonUI()
     end
 
     -- Event
-    bottomEvent = function(key)
+    bottomEventFunc = function(key)
         if isBluetoothOn then
             if key == "a" then
                 -- Connect
@@ -141,8 +129,8 @@ function BottomButtonUI()
                 -- Delete
             elseif key == "y" then
                 -- Scan
-                LoadAvailableDevices()
-                LoadConnectedDevices()
+                Scan()
+
             elseif key == "l1" then
                 -- PowerOff
                 TurnOffBluetooth()
@@ -156,18 +144,51 @@ function BottomButtonUI()
     end
 end
 
+function Scan()
+    msgLog = "Scanning..."
+    timeRunScanFunc = love.timer.getTime()
+    runScanFunc = function ()
+        LoadAvailableDevices()
+        LoadConnectedDevices()
+        isAvailableDevicesSelected = table.getn(availableDevices) > 0
+    end
+end
+
 function ConnectDevice()
     if table.getn(availableDevices) < 1 then
         return
     end
 
-    if isAvailableDevicesSelected then
-        local MAC = availableDevices[idxAvailableDevices].ip
-        Bluetooth.Connect(MAC)
-        connectedDevices = Bluetooth.GetConnectedDevices()
-        msgLog = "Connected: " .. MAC
-    else
-        msgLog = "TODO: Something..."
+    msgLog = "Connecting..."
+    timeRunConnectFunc = love.timer.getTime()
+    runConnectFunc = function ()
+        if isAvailableDevicesSelected then
+            local MAC = availableDevices[idxAvailableDevices].ip
+            Bluetooth.Connect(MAC)
+            connectedDevices = Bluetooth.GetConnectedDevices()
+    
+            local tempDevices = availableDevices
+            availableDevices = {}
+            
+            for _, device in ipairs(tempDevices) do
+                local isExits = false
+                for _, cDevice in ipairs(connectedDevices) do
+                    if device.ip == cDevice.ip then
+                        isExits = true
+                    end
+                end
+
+                if not isExits then
+                    table.insert(availableDevices, device)
+                end
+            end
+    
+            isAvailableDevicesSelected = table.getn(availableDevices) > 0
+    
+            msgLog = "Connected: " .. MAC
+        else
+            msgLog = "TODO: Something..."
+        end 
     end
 end
 
@@ -180,11 +201,17 @@ function DisconnectDevice()
         return
     end
 
-    local MAC = connectedDevices[idxConnectedDevice].ip
-    Bluetooth.Disconnect(MAC)
-    connectedDevices = Bluetooth.GetConnectedDevices()
-    msgLog = "Disconnected: " .. MAC
-    idxConnectedDevice = 0
+    msgLog = "Disconnecting..."
+    timeRunDisConnectFunc = love.timer.getTime()
+    runDisConnectFunc = function ()
+        local MAC = connectedDevices[idxConnectedDevice].ip
+        Bluetooth.Disconnect(MAC)
+        connectedDevices = Bluetooth.GetConnectedDevices()
+        msgLog = "Disconnected: " .. MAC
+        idxConnectedDevice = 0
+        idxAvailableDevices = 0
+        isAvailableDevicesSelected = not table.getn(connectedDevices) == 0
+    end
 end
 
 function LoadAvailableDevices()
@@ -218,8 +245,8 @@ function TurnOffBluetooth()
 end
 
 function OnKeyPress(key)
-    if bottomEvent then
-        bottomEvent(key)
+    if bottomEventFunc then
+        bottomEventFunc(key)
     end
 
     if key == "left" or key == "right" then
@@ -260,6 +287,30 @@ end
 function love.update(dt)
     input.update(dt)
     input.onClick(OnKeyPress)
+
+    if runScanFunc then
+        local currentTime = love.timer.getTime()
+        if currentTime - timeRunScanFunc > 0.2 then
+            runScanFunc()
+            runScanFunc = nil
+        end
+    end
+
+    if runConnectFunc then
+        local currentTime = love.timer.getTime()
+        if currentTime - timeRunConnectFunc > 0.2 then
+            runConnectFunc()
+            runConnectFunc = nil
+        end
+    end
+
+    if runDisConnectFunc then
+        local currentTime = love.timer.getTime()
+        if currentTime - timeRunDisConnectFunc > 0.2 then
+            runDisConnectFunc()
+            runDisConnectFunc = nil
+        end
+    end
 end
 
 function love.keypressed(key)
