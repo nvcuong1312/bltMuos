@@ -1,9 +1,11 @@
 local StringHelper = {}
 
 function StringHelper.IsMACAndNameValid(MAC, Name)
-    local s1 = MAC:gsub(":", "")
-    local s2 = Name:gsub("-", "")
-    return s1 ~= s2
+    -- local s1 = MAC:gsub(":", "")
+    -- local s2 = Name:gsub("-", "")
+    -- return s1 ~= s2
+
+    return true
 end
 
 function StringHelper.FormatStringToLarge(str, maxLength)
