@@ -1,7 +1,6 @@
 local love = require("love")
 
 local Bluetooth = require("bluetooth")
-local input = require("input")
 
 local msgLog = ""
 
@@ -27,8 +26,6 @@ local runDisConnectFunc
 local timeRunDisConnectFunc = 0
 
 function love.load()
-    input.load()
-
     isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
         LoadConnectedDevices()
@@ -40,7 +37,7 @@ function love.draw()
         AvailableDevicesUI()
         ConnectedDevicesUI()
     else
-        love.graphics.print("Press [R1] to Power On Bluetooth", 200, 200)
+        love.graphics.print("Press [Start] to Power On Bluetooth", 200, 200)
     end
 
     BottomButtonUI()
@@ -107,13 +104,12 @@ function BottomButtonUI()
     -- UI
     if isBluetoothOn then
         love.graphics.print("[Y]: Scan", 10, 430)
-        love.graphics.print("[A]: Connect", 100, 430)
-        love.graphics.print("[B]: Disconnect", 100, 450)
-        -- love.graphics.print("[X]: Remove", 100, 450)
-        love.graphics.print("[L1]: PowerOff Bluetooth", 200, 430)
-        love.graphics.print("[Select+Start]: Quit", 200, 450)
+        love.graphics.print("[A]: Connect", 80, 430)
+        love.graphics.print("[X]: Disconnect", 80, 450)
+        love.graphics.print("[Select]: PowerOff Bluetooth", 180, 430)
+        love.graphics.print("[Menu]: Quit", 180, 450)
     else
-        love.graphics.print("[R1]: PowerOn Bluetooth", 200, 430)
+        love.graphics.print("[Start]: PowerOn Bluetooth", 180, 430)
     end
 
     -- Event
@@ -122,21 +118,21 @@ function BottomButtonUI()
             if key == "a" then
                 -- Connect
                 ConnectDevice()
-            elseif key == "b" then
+            elseif key == "x" then
                 -- Disconnect-7
                 DisconnectDevice()
-            elseif key == "x" then
+            elseif key == "b" then
                 -- Delete
             elseif key == "y" then
                 -- Scan
                 Scan()
 
-            elseif key == "l1" then
+            elseif key == "select" then
                 -- PowerOff
                 TurnOffBluetooth()
             end
         else
-            if key == "r1" then
+            if key == "start" then
                 -- PowerOn
                 TurnOnBluetooth()
             end
@@ -248,7 +244,7 @@ function OnKeyPress(key)
     if bottomEventFunc then
         bottomEventFunc(key)
     end
-
+    
     if key == "left" or key == "right" then
         isAvailableDevicesSelected = not isAvailableDevicesSelected
         idxAvailableDevices = 1
@@ -281,13 +277,13 @@ function OnKeyPress(key)
                 idxConnectedDevice = 1
             end
         end
+
+        elseif key == "guide" then
+            love.event.quit()
     end
 end
 
 function love.update(dt)
-    input.update(dt)
-    input.onClick(OnKeyPress)
-
     if runScanFunc then
         local currentTime = love.timer.getTime()
         if currentTime - timeRunScanFunc > 0.2 then
@@ -316,3 +312,48 @@ end
 function love.keypressed(key)
     OnKeyPress(key)
 end
+
+function love.gamepadpressed(joystick, button)
+    local key = ""
+    if button == "dpleft" then
+        key = "left"
+    end
+    if button == "dpright" then
+        key = "right"
+    end
+    if button == "dpup" then
+        key = "up"
+    end
+    if button == "dpdown" then
+        key = "down"
+    end
+    if button == "a" then
+        key = "a"
+    end
+    if button == "b " then
+        key = "b"
+    end
+    if button == "x" then
+        key = "x"
+    end
+    if button == "y" then
+        key = "y"
+    end
+    if button == "back" then
+        key = "select"
+    end
+    if button == "start" then
+        key = "start"
+    end
+    if button == "leftshoulder" then
+        key = "l1"
+    end
+    if button == "rightshoulder" then
+        key = "r1"
+    end
+    if button == "guide" then
+        key = "guide"
+    end
+
+    OnKeyPress(key)
+ end
