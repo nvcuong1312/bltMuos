@@ -1,6 +1,7 @@
 local love = require("love")
 
 local Bluetooth = require("bluetooth")
+local Config = require("config")
 
 local msgLog = ""
 
@@ -33,6 +34,10 @@ function love.load()
 end
 
 function love.draw()
+    love.graphics.setBackgroundColor(0.043, 0.161, 0.094)
+
+    HeaderUI()
+
     if isBluetoothOn then
         AvailableDevicesUI()
         ConnectedDevicesUI()
@@ -47,28 +52,79 @@ function love.draw()
     love.graphics.print(msgLog, 380, 442)
 end
 
+function HeaderUI()
+    local xPos = 0
+    local yPos = 0
+
+    love.graphics.setColor(0.31, 0.31, 0.118)
+    love.graphics.rectangle("fill", xPos, yPos, 640, 30)
+
+    love.graphics.setColor(0.98, 0.98, 0.749)
+    local font = love.graphics.newFont(18)
+    love.graphics.setFont(font)
+    love.graphics.print("Bluetooth Setting", xPos + 230, yPos + 5)
+
+    Now = os.date('*t')
+    local formatted_time = string.format("%d:%02d", tonumber(Now.hour), tonumber(Now.min))
+    love.graphics.setColor(0.98, 0.98, 0.749, 0.7)
+    love.graphics.print(formatted_time, xPos + 10, yPos + 5)
+
+    font = love.graphics.newFont(12)
+    love.graphics.setFont(font)
+end
+
 function AvailableDevicesUI()
     -- UI
-    local xPos = 10;
-    local yPos = 10
-    love.graphics.rectangle("line", xPos, yPos, 300, 400)
-    love.graphics.print("Available Devices:", xPos + 10, yPos + 10)
+    local xPos = 0
+    local yPos = 30
+    local width = 320
+    local height = 370
+
+    love.graphics.setColor(0.102, 0.141, 0.078)
+    love.graphics.rectangle("fill", xPos, yPos, width, height)
+
+    -- Header
+    if isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
+    else love.graphics.setColor(0.247, 0.278, 0.224)
+    end
+    
+    love.graphics.rectangle("fill", xPos, yPos, width, 30)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Available", xPos + 120, yPos + 7)
 
     local iPos = 0
     local lineHeight = 15
-    love.graphics.print("MAC", xPos + 10, yPos + 30)
-    love.graphics.print("Name", xPos + 150, yPos + 30)
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
 
-    for _, device in ipairs(availableDevices) do
+    love.graphics.setColor(0.169, 0.259, 0.212)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
+    
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
+    
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
+
+    for idx, device in ipairs(availableDevices) do
+        if idx > Config.GRID_PAGE_ITEM then
+            goto continue
+        end
+
         if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
             love.graphics.setColor(1.4,1.4,0.4)
         else
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 50)
-        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 50)
+        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 65)
+        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 65)
         iPos = iPos + 1
+        ::continue::
     end
 
     love.graphics.setColor(1,1,1)
@@ -76,25 +132,56 @@ end
 
 function ConnectedDevicesUI()
     -- UI
-    local xPos = 330;
-    local yPos = 10
-    love.graphics.rectangle("line", xPos, yPos, 300, 400)
-    love.graphics.print("Connected Devices:", xPos + 10, yPos + 10)
+    local xPos = 320
+    local yPos = 30
+    local width = 320
+    local height = 370
+
+    love.graphics.setColor(0.114, 0.149, 0.094)
+    love.graphics.rectangle("fill", xPos, yPos, width, height, 5, 5, 10)
+
+    -- Header
+    if not isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
+    else love.graphics.setColor(0.247, 0.278, 0.224)
+    end
+
+    love.graphics.rectangle("fill", xPos, yPos, width, 30)
+    
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Connected", xPos + 120, yPos + 7)
 
     local iPos = 0
     local lineHeight = 15
-    love.graphics.print("MAC", xPos + 10, yPos + 30)
-    love.graphics.print("Name", xPos + 150, yPos + 30)
-    for _, device in ipairs(connectedDevices) do
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
+
+    love.graphics.setColor(0.169, 0.259, 0.212)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
+    
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
+    
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
+
+    for idx, device in ipairs(connectedDevices) do
+        if idx > Config.GRID_PAGE_ITEM then
+            goto continue
+        end
+
         if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
             love.graphics.setColor(1.4,1.4,0.4)
         else
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 50)
-        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 50)
+        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 65)
+        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 65)
         iPos = iPos + 1
+        ::continue::
     end
 
     love.graphics.setColor(1,1,1)
@@ -357,18 +444,3 @@ function love.gamepadpressed(joystick, button)
 
     OnKeyPress(key)
  end
-
-function round_rectangle(x, y, width, height, radius)
-	--RECTANGLES
-	love.graphics.rectangle("fill", x + radius, y + radius, width - (radius * 2), height - radius * 2)
-	love.graphics.rectangle("fill", x + radius, y, width - (radius * 2), radius)
-	love.graphics.rectangle("fill", x + radius, y + height - radius, width - (radius * 2), radius)
-	love.graphics.rectangle("fill", x, y + radius, radius, height - (radius * 2))
-	love.graphics.rectangle("fill", x + (width - radius), y + radius, radius, height - (radius * 2))
-	
-	--ARCS
-	love.graphics.arc("fill", x + radius, y + radius, radius, math.rad(-180), math.rad(-90))
-	love.graphics.arc("fill", x + width - radius , y + radius, radius, math.rad(-90), math.rad(0))
-	love.graphics.arc("fill", x + radius, y + height - radius, radius, math.rad(-180), math.rad(-270))
-	love.graphics.arc("fill", x + width - radius , y + height - radius, radius, math.rad(0), math.rad(90))
-end
