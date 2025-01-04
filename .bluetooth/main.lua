@@ -31,6 +31,9 @@ local timeRunDisConnectFunc = 0
 
 local ic_bluetooth
 
+local isTimeoutShow = false
+local idxTimeout = 1
+
 function love.load()
     isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
@@ -62,6 +65,8 @@ function love.draw()
     -- Log MSG
     love.graphics.rectangle("line", 370, 430, 260, 40)
     love.graphics.print(msgLog, 380, 442)
+
+    ScanTimeoutSelectionUI()
 end
 
 function HeaderUI()
@@ -230,18 +235,29 @@ function BottomButtonUI()
     -- Event
     bottomEventFunc = function(key)
         if isBluetoothOn then
-            if key == "a" then
-                -- Connect
-                ConnectDevice()
-            elseif key == "x" then
-                -- Disconnect
-                DisconnectDevice()
-            elseif key == "y" then
+            if not isTimeoutShow then
+                if key == "a" then
+                    -- Connect
+                    ConnectDevice()
+                elseif key == "x" then
+                    -- Disconnect
+                    DisconnectDevice()
+                elseif key == "select" then
+                    -- PowerOff
+                    TurnOffBluetooth()
+                end
+            else
+                if key == "a" then
+                    Scan()
+                    HideScanTimeoutUI()
+                elseif key == "b" then
+                    HideScanTimeoutUI()
+                end
+            end
+
+            if key == "y" then
                 -- Scan
-                Scan()
-            elseif key == "select" then
-                -- PowerOff
-                TurnOffBluetooth()
+                ShowScanTimeoutUI()
             end
         else
             if key == "start" then
@@ -250,6 +266,57 @@ function BottomButtonUI()
             end
         end
     end
+end
+
+function ScanTimeoutSelectionUI()
+    if not isTimeoutShow then
+        return
+    end
+
+    local xPos = 180
+    local yPos = 100
+
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.rectangle("fill", 0,0, 640, 480)
+
+    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.rectangle("fill", xPos,yPos, 300, 200)
+
+    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.rectangle("fill", xPos,yPos, 300, 30)
+
+    local font = love.graphics.newFont(18)
+    love.graphics.setFont(font)
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.print("Choose timeout", xPos + 80, yPos + 5)
+
+    local iPos = 1
+    local lineHeight = 20
+    for _,timeout in ipairs(Config.TIMEOUT_LIST) do
+        love.graphics.setColor(1,1,1)
+        if iPos == idxTimeout then
+            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
+            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 30, 300, lineHeight)
+            love.graphics.setColor(1,1,1)
+        end
+
+        love.graphics.print(timeout, xPos + 10, iPos * lineHeight + yPos + 30)
+        iPos = iPos + 1
+    end
+
+    font = love.graphics.newFont(12)
+    love.graphics.setFont(font)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("A: Continue   B: Close", xPos, yPos + 200)
+end
+
+function ShowScanTimeoutUI()
+    isTimeoutShow = true
+end
+
+function HideScanTimeoutUI()
+    isTimeoutShow = false
 end
 
 function Scan()
@@ -348,7 +415,8 @@ function DisconnectDevice()
 end
 
 function LoadAvailableDevices()
-    Bluetooth.ScanDevices(5)
+    local timeout = Config.TIMEOUT_LIST[idxTimeout]
+    Bluetooth.ScanDevices(timeout)
     availableDevices = Bluetooth.GetAvailableDevices()
     msgLog = "Scanning complete!!!"
 end
@@ -402,36 +470,51 @@ function OnKeyPress(key)
         idxAvailableDevices = 1
         SetIdxConnectedDevice(1)
     elseif key == "up" then
-        if isAvailableDevicesSelected then
-            if idxAvailableDevices > 1 then
-                idxAvailableDevices = idxAvailableDevices - 1
+        if isTimeoutShow then
+            if idxTimeout > 1 then
+                idxTimeout = idxTimeout - 1
             else
-                idxAvailableDevices = table.getn(availableDevices)
+                idxTimeout = table.getn(Config.TIMEOUT_LIST)
             end
         else
-            if idxConnectedDevice > 1 then
-                SetIdxConnectedDevice(idxConnectedDevice - 1)
+            if isAvailableDevicesSelected then
+                if idxAvailableDevices > 1 then
+                    idxAvailableDevices = idxAvailableDevices - 1
+                else
+                    idxAvailableDevices = table.getn(availableDevices)
+                end
             else
-                SetIdxConnectedDevice(table.getn(connectedDevices))
+                if idxConnectedDevice > 1 then
+                    SetIdxConnectedDevice(idxConnectedDevice - 1)
+                else
+                    SetIdxConnectedDevice(table.getn(connectedDevices))
+                end
             end
         end
     elseif key == "down" then
-        if isAvailableDevicesSelected then
-            if idxAvailableDevices < table.getn(availableDevices) then
-                idxAvailableDevices = idxAvailableDevices + 1
+        if isTimeoutShow then
+            if idxTimeout < table.getn(Config.TIMEOUT_LIST) then
+                idxTimeout = idxTimeout + 1
             else
-                idxAvailableDevices = 1
+                idxTimeout = 1
             end
         else
-            if idxConnectedDevice < table.getn(connectedDevices) then
-                SetIdxConnectedDevice(idxConnectedDevice + 1)
+            if isAvailableDevicesSelected then
+                if idxAvailableDevices < table.getn(availableDevices) then
+                    idxAvailableDevices = idxAvailableDevices + 1
+                else
+                    idxAvailableDevices = 1
+                end
             else
-                SetIdxConnectedDevice(1)
+                if idxConnectedDevice < table.getn(connectedDevices) then
+                    SetIdxConnectedDevice(idxConnectedDevice + 1)
+                else
+                    SetIdxConnectedDevice(1)
+                end
             end
         end
-
-        elseif key == "guide" then
-            love.event.quit()
+    elseif key == "guide" then
+        love.event.quit()
     end
 end
 
@@ -482,7 +565,7 @@ function love.gamepadpressed(joystick, button)
     if button == "a" then
         key = "a"
     end
-    if button == "b " then
+    if button == "b" then
         key = "b"
     end
     if button == "x" then

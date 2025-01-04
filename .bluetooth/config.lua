@@ -12,5 +12,7 @@ Config.BLUETOOTH_CONNECT_PATH = "data/connect.txt"
 -- Grid
 Config.GRID_PAGE_ITEM = 20
 
+--
+Config.TIMEOUT_LIST = {"3", "5", "10", "15", "20", "25"}
 
 return Config
