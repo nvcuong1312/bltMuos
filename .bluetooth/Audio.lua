@@ -1,5 +1,6 @@
 local socket = require("socket")
 local Config = require("config")
+local StringHelper = require("Helper/StringHelper")
 
 local Audio = {}
 
@@ -14,7 +15,7 @@ function Audio.DefaultSinkNumber()
     local file = io.open(Config.AUDIO_SINK_NUMBER, "r")
     local defSinkNumber = ""
     if file then
-        defSinkNumber = file:read("*a")
+        defSinkNumber = StringHelper.Trim(file:read("*a"))
         file:close()
     end
 

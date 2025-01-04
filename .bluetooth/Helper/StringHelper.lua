@@ -14,4 +14,8 @@ function StringHelper.FormatStringToLarge(str, maxLength)
     return str
 end
 
+function StringHelper.Trim(s)
+    return s:match("^%s*(.-)%s*$")
+end
+
 return StringHelper
