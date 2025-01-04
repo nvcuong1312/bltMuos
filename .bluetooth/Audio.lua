@@ -42,7 +42,7 @@ function Audio.Sinks()
 end
 
 function Audio.Select(id)
-    local cmd = "wpctl set-default " .. id
+    local cmd = "wpctl set-default \"" .. id .. "\""
     if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") ~= "1" then
         os.execute(cmd)
         socket.sleep(0.5)
