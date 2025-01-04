@@ -293,7 +293,7 @@ function ConnectDevice()
                 end
             end
         else
-            local MAC = availableDevices[idxAvailableDevices].ip
+            local MAC = connectedDevices[idxConnectedDevice].ip
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
         end
