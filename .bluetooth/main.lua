@@ -262,7 +262,8 @@ function Scan()
 end
 
 function ConnectDevice()
-    if table.getn(availableDevices) < 1 then
+    if (isAvailableDevicesSelected and table.getn(availableDevices) < 1)
+    or (not isAvailableDevicesSelected and itemSelectedType == Bluetooth.ConnectedType.PAIRED) then
         return
     end
 
