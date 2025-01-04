@@ -9,6 +9,9 @@ Config.BLUETOOTH_TRUST_PATH = "data/trust.txt"
 Config.BLUETOOTH_PAIR_PATH = "data/pair.txt"
 Config.BLUETOOTH_CONNECT_PATH = "data/connect.txt"
 
+Config.AUDIO_SINK_NUMBER = "data/sinknumber.txt"
+Config.AUDIO_SINKS = "data/sinks.txt"
+
 -- Grid
 Config.GRID_PAGE_ITEM = 20
 

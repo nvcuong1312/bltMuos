@@ -2,6 +2,7 @@ local love = require("love")
 
 local Bluetooth = require("bluetooth")
 local Config = require("config")
+local Audio = require("Audio")
 
 local msgLog = ""
 
@@ -33,6 +34,10 @@ local ic_bluetooth
 
 local isTimeoutShow = false
 local idxTimeout = 1
+
+local isAudioShow = false
+local idxAudio = 1
+local audioList = {}
 
 function love.load()
     isBluetoothOn = Bluetooth.IsPowerOn()
@@ -67,6 +72,7 @@ function love.draw()
     love.graphics.print(msgLog, 380, 442)
 
     ScanTimeoutSelectionUI()
+    AudioSelectionUI()
 end
 
 function HeaderUI()
@@ -225,17 +231,32 @@ function BottomButtonUI()
 
     -- UI
     love.graphics.setColor(1,1,1)
-    love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
-    love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
     love.graphics.print("[Y]: Scan", xPos + 100, yPos)
     love.graphics.print("[A]: Connect", xPos, yPos)
     love.graphics.print("[X]: " .. txtDisconnectRemoveBtn, xPos, yPos + 20)
     love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
+    love.graphics.print("[Start]  : ON",  xPos + 180, yPos)
+    love.graphics.print("[Select]: OFF", xPos + 180, yPos + 20)
+    love.graphics.print("[L1]: Audio",  xPos + 265, yPos + 20)
 
     -- Event
     bottomEventFunc = function(key)
         if isBluetoothOn then
-            if not isTimeoutShow then
+            if isTimeoutShow then
+                if key == "a" then
+                    Scan()
+                    HideScanTimeoutUI()
+                elseif key == "b" then
+                    HideScanTimeoutUI()
+                end
+            else if isAudioShow then
+                if key == "a" then
+                    SelectAudio()
+                    HideAudioSeleciton()
+                elseif key == "b" then
+                    HideAudioSeleciton()
+                end
+            else
                 if key == "a" then
                     -- Connect
                     ConnectDevice()
@@ -245,20 +266,13 @@ function BottomButtonUI()
                 elseif key == "select" then
                     -- PowerOff
                     TurnOffBluetooth()
-                end
-            else
-                if key == "a" then
-                    Scan()
-                    HideScanTimeoutUI()
-                elseif key == "b" then
-                    HideScanTimeoutUI()
+                else if key == "y" then
+                    -- Scan
+                    ShowScanTimeoutUI()
+                    end
                 end
             end
-
-            if key == "y" then
-                -- Scan
-                ShowScanTimeoutUI()
-            end
+        end
         else
             if key == "start" then
                 -- PowerOn
@@ -309,6 +323,49 @@ function ScanTimeoutSelectionUI()
 
     love.graphics.setColor(1,1,1)
     love.graphics.print("A: Continue   B: Close", xPos, yPos + 200)
+end
+
+function AudioSelectionUI()
+    if not isAudioShow then
+        return
+    end
+
+    local xPos = 140
+    local yPos = 80
+
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.rectangle("fill", 0,0, 640, 480)
+
+    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 300)
+
+    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 30)
+
+    local font = love.graphics.newFont(18)
+    love.graphics.setFont(font)
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.print("Select a sound output ", xPos + 80, yPos + 5)
+
+    local iPos = 1
+    local lineHeight = 20
+    for _,audio in ipairs(audioList) do
+        love.graphics.setColor(1,1,1)
+        if iPos == idxAudio then
+            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
+            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 20, 400, lineHeight)
+            love.graphics.setColor(1,1,1)
+        end
+
+        love.graphics.print("[" .. audio.id .. "] " .. audio.name, xPos + 10, iPos * lineHeight + yPos + 20)
+        iPos = iPos + 1
+    end
+
+    font = love.graphics.newFont(12)
+    love.graphics.setFont(font)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("A: Select   B: Close", xPos, yPos + 300)
 end
 
 function ShowScanTimeoutUI()
@@ -476,6 +533,12 @@ function OnKeyPress(key)
             else
                 idxTimeout = table.getn(Config.TIMEOUT_LIST)
             end
+        else if isAudioShow then
+            if idxAudio > 1 then
+                idxAudio = idxAudio - 1
+            else
+                idxAudio = table.getn(audioList)
+            end
         else
             if isAvailableDevicesSelected then
                 if idxAvailableDevices > 1 then
@@ -491,12 +554,19 @@ function OnKeyPress(key)
                 end
             end
         end
+    end
     elseif key == "down" then
         if isTimeoutShow then
             if idxTimeout < table.getn(Config.TIMEOUT_LIST) then
                 idxTimeout = idxTimeout + 1
             else
                 idxTimeout = 1
+            end
+        else if isAudioShow then
+            if idxAudio < table.getn(audioList) then
+                idxAudio = idxAudio + 1
+            else
+                idxAudio = 1
             end
         else
             if isAvailableDevicesSelected then
@@ -513,9 +583,41 @@ function OnKeyPress(key)
                 end
             end
         end
+    end
+    else if key == "l1" then
+        ShowAudioSelection()
     elseif key == "guide" then
         love.event.quit()
+        end
     end
+end
+
+function SelectAudio()
+    if table.getn(audioList) < idxAudio then
+        return
+    end
+
+    Audio.Select(audioList[idxAudio].id)
+
+    msgLog = "Audio: " .. audioList[idxAudio].id .. " " .. audioList[idxAudio].name
+end
+
+function HideAudioSeleciton()
+    isAudioShow = false
+end
+
+function ShowAudioSelection()
+    audioList = Audio.Sinks()
+    local defSinkNumber = Audio.DefaultSinkNumber()
+    for idx,item in ipairs(audioList) do
+        if item.id == defSinkNumber then
+            idxAudio = idx
+        end
+    end
+
+    msgLog = defSinkNumber .." " ..idxAudio
+
+    isAudioShow = true
 end
 
 function love.update(dt)
@@ -545,6 +647,10 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
+    if key == "l" then
+        key = "l1"
+    end
+
     OnKeyPress(key)
 end
 
