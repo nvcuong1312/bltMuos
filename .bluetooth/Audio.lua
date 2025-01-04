@@ -34,7 +34,7 @@ function Audio.Sinks()
     if file then
         for line in file:lines() do
             local id, name = line:match("^(%d+):(.+)$")
-            table.insert(sinks, {id = id, name = name})
+            table.insert(sinks, {id = StringHelper.Trim(id), name = StringHelper.Trim(name)})
         end
     end
 
