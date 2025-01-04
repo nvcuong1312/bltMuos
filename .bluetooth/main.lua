@@ -308,6 +308,8 @@ function ConnectDevice()
 
         if not isExists then
             msgLog = "Failed to connect: " .. MAC
+        else
+            msgLog = "Connected: " .. MAC
         end
 
         isAvailableDevicesSelected = table.getn(availableDevices) > 0
