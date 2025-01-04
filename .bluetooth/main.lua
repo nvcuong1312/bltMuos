@@ -300,8 +300,8 @@ function ConnectDevice()
         end
 
         local isExists = false
-        for device in ipairs(connectedDevices) do
-            if device.ip == MAC then
+        for _,device in ipairs(connectedDevices) do
+            if device.ip == MAC and device.type == Bluetooth.ConnectedType.CONNECTED then
                 isExists = true
             end
         end
