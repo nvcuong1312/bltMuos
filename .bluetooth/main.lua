@@ -16,6 +16,7 @@ local idxConnectedDevice = 1
 local connectedDevices = {}
 local titleConnectedDevice = ""
 local itemSelectedType = Bluetooth.ConnectedType.NOTHING
+local txtDisconnectRemoveBtn = ""
 
 local bottomEventFunc
 
@@ -223,7 +224,7 @@ function BottomButtonUI()
     love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
     love.graphics.print("[Y]: Scan", xPos + 100, yPos)
     love.graphics.print("[A]: Connect", xPos, yPos)
-    love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
+    love.graphics.print("[X]: " .. txtDisconnectRemoveBtn, xPos, yPos + 20)
     love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
 
     -- Event
@@ -329,9 +330,17 @@ function DisconnectDevice()
     timeRunDisConnectFunc = love.timer.getTime()
     runDisConnectFunc = function ()
         local MAC = connectedDevices[idxConnectedDevice].ip
-        Bluetooth.Disconnect(MAC)
+        local dType = connectedDevices[idxConnectedDevice].type
+
+        if dType == Bluetooth.ConnectedType.CONNECTED then
+            Bluetooth.Disconnect(MAC)
+            msgLog = "Disconnected: " .. MAC
+        else
+            Bluetooth.Remove(MAC)
+            msgLog = "Removed: " .. MAC
+        end
+
         connectedDevices = Bluetooth.GetConnectedDevices()
-        msgLog = "Disconnected: " .. MAC
         SetIdxConnectedDevice(1)
         idxAvailableDevices = 1
         isAvailableDevicesSelected = not table.getn(connectedDevices) == 0
@@ -373,10 +382,14 @@ function SetIdxConnectedDevice(idx)
 
     if table.getn(connectedDevices) < idx then
         itemSelectedType = Bluetooth.ConnectedType.NOTHING
+        txtDisconnectRemoveBtn = "Disconnect"
         return
     end
 
     itemSelectedType = connectedDevices[idx].type
+    if itemSelectedType == Bluetooth.ConnectedType.CONNECTED then txtDisconnectRemoveBtn = "Disconnect"
+    else txtDisconnectRemoveBtn = "Remove"
+    end
 end
 
 function OnKeyPress(key)
