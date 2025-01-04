@@ -357,7 +357,7 @@ function AudioSelectionUI()
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print(audio.name, xPos + 10, iPos * lineHeight + yPos + 20)
+        love.graphics.print("[" .. audio.id .. "] " .. audio.name, xPos + 10, iPos * lineHeight + yPos + 20)
         iPos = iPos + 1
     end
 
@@ -614,6 +614,8 @@ function ShowAudioSelection()
             idxAudio = idx
         end
     end
+
+    msgLog = defSinkNumber .." " ..idxAudio
 
     isAudioShow = true
 end
