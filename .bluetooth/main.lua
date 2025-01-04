@@ -262,15 +262,17 @@ function Scan()
 end
 
 function ConnectDevice()
-    if (isAvailableDevicesSelected and table.getn(availableDevices) < 1)
-    or (not isAvailableDevicesSelected and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED) then
+    if (    isAvailableDevicesSelected and table.getn(availableDevices) < 1)
+        or (not isAvailableDevicesSelected
+            and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED
+            and table.getn(connectedDevices) > 0) then
         return
     end
 
     msgLog = "Connecting..."
     timeRunConnectFunc = love.timer.getTime()
     runConnectFunc = function ()
-        if isAvailableDevicesSelected or itemSelectedType == Bluetooth.ConnectedType.PAIRED then
+        if isAvailableDevicesSelected then
             local MAC = availableDevices[idxAvailableDevices].ip
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
@@ -290,9 +292,13 @@ function ConnectDevice()
                     table.insert(availableDevices, device)
                 end
             end
-
-            isAvailableDevicesSelected = table.getn(availableDevices) > 0
+        else
+            local MAC = availableDevices[idxAvailableDevices].ip
+            Bluetooth.Connect(MAC)
+            connectedDevices = Bluetooth.GetConnectedDevices()
         end
+
+        isAvailableDevicesSelected = table.getn(availableDevices) > 0
     end
 end
 
