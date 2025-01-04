@@ -14,6 +14,8 @@ local availableDevices = {}
 
 local idxConnectedDevice = 1
 local connectedDevices = {}
+local titleConnectedDevice = ""
+local itemSelectedType = Bluetooth.ConnectedType.NOTHING
 
 local bottomEventFunc
 
@@ -32,6 +34,11 @@ function love.load()
     isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
         LoadConnectedDevices()
+
+        if table.getn(connectedDevices) > 0 then
+            isAvailableDevicesSelected = false
+            itemSelectedType = connectedDevices[1].type
+        end
     end
 
     ic_bluetooth = love.graphics.newImage("Assets/Icon/ic_bluetooth.png")
@@ -67,7 +74,7 @@ function HeaderUI()
     local font = love.graphics.newFont(18)
     love.graphics.setFont(font)
     love.graphics.draw(ic_bluetooth, 640 - 25, yPos + 4)
-    love.graphics.print("Bluetooth Setting", xPos + 230, yPos + 5)
+    love.graphics.print("Bluetooth Settings", xPos + 230, yPos + 5)
 
     Now = os.date('*t')
     local formatted_time = string.format("%d:%02d", tonumber(Now.hour), tonumber(Now.min))
@@ -153,7 +160,20 @@ function ConnectedDevicesUI()
     love.graphics.rectangle("fill", xPos, yPos, width, 30)
 
     love.graphics.setColor(1,1,1)
-    love.graphics.print("Connected", xPos + 120, yPos + 7)
+    if isAvailableDevicesSelected then
+        titleConnectedDevice = "Connected/Paired"
+    else
+        if itemSelectedType == Bluetooth.ConnectedType.CONNECTED then
+            titleConnectedDevice = "Connected"
+        else if itemSelectedType == Bluetooth.ConnectedType.PAIRED then
+            titleConnectedDevice = "Paired"
+        else
+            titleConnectedDevice = "Connected/Paired"
+            end
+        end
+    end
+
+    love.graphics.print(titleConnectedDevice, xPos + 120, yPos + 7)
 
     local iPos = 0
     local lineHeight = 15
@@ -198,42 +218,13 @@ function BottomButtonUI()
     local yPos = 435
 
     -- UI
-    if isBluetoothOn then
-        love.graphics.setColor(1,1,1)
-        love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
-        love.graphics.print("[Y]: Scan", xPos + 100, yPos)
-
-        love.graphics.setColor(1,1,1, 0.5)
-        love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
-
-        love.graphics.setColor(1,1,1)
-        if isAvailableDevicesSelected then
-            love.graphics.setColor(1,1,1)
-            love.graphics.print("[A]: Connect", xPos, yPos)
-
-            love.graphics.setColor(1,1,1, 0.5)
-            love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
-        else
-            love.graphics.setColor(1,1,1, 0.5)
-            love.graphics.print("[A]: Connect", xPos, yPos)
-
-            love.graphics.setColor(1,1,1)
-            love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
-        end
-    else
-        love.graphics.setColor(1,1,1, 0.5)
-        love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
-        love.graphics.print("[Y]: Scan", xPos + 100, yPos)
-        love.graphics.print("[A]: Connect", xPos, yPos)
-        love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
-
-        love.graphics.setColor(1,1,1)
-        love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
-    end
-
     love.graphics.setColor(1,1,1)
+    love.graphics.print("[Start]: PowerOn Bluetooth",  xPos + 180, yPos + 20)
+    love.graphics.print("[Select]: PowerOff Bluetooth", xPos + 180, yPos)
+    love.graphics.print("[Y]: Scan", xPos + 100, yPos)
+    love.graphics.print("[A]: Connect", xPos, yPos)
+    love.graphics.print("[X]: Disconnect", xPos, yPos + 20)
     love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
-
 
     -- Event
     bottomEventFunc = function(key)
@@ -244,12 +235,9 @@ function BottomButtonUI()
             elseif key == "x" then
                 -- Disconnect
                 DisconnectDevice()
-            elseif key == "b" then
-                -- Delete
             elseif key == "y" then
                 -- Scan
                 Scan()
-
             elseif key == "select" then
                 -- PowerOff
                 TurnOffBluetooth()
@@ -274,15 +262,19 @@ function Scan()
 end
 
 function ConnectDevice()
-    if table.getn(availableDevices) < 1 then
+    if (    isAvailableDevicesSelected and table.getn(availableDevices) < 1)
+        or (not isAvailableDevicesSelected
+            and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED
+            and table.getn(connectedDevices) > 0) then
         return
     end
 
     msgLog = "Connecting..."
     timeRunConnectFunc = love.timer.getTime()
     runConnectFunc = function ()
+        local MAC = ""
         if isAvailableDevicesSelected then
-            local MAC = availableDevices[idxAvailableDevices].ip
+            MAC = availableDevices[idxAvailableDevices].ip
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
 
@@ -301,13 +293,26 @@ function ConnectDevice()
                     table.insert(availableDevices, device)
                 end
             end
-
-            isAvailableDevicesSelected = table.getn(availableDevices) > 0
-
-            msgLog = "Connected: " .. MAC
         else
-            msgLog = "TODO: Something..."
+            MAC = connectedDevices[idxConnectedDevice].ip
+            Bluetooth.Connect(MAC)
+            connectedDevices = Bluetooth.GetConnectedDevices()
         end
+
+        local isExists = false
+        for _,device in ipairs(connectedDevices) do
+            if device.ip == MAC and device.type == Bluetooth.ConnectedType.CONNECTED then
+                isExists = true
+            end
+        end
+
+        if not isExists then
+            msgLog = "Failed to connect: " .. MAC
+        else
+            msgLog = "Connected: " .. MAC
+        end
+
+        isAvailableDevicesSelected = table.getn(availableDevices) > 0
     end
 end
 
@@ -327,7 +332,7 @@ function DisconnectDevice()
         Bluetooth.Disconnect(MAC)
         connectedDevices = Bluetooth.GetConnectedDevices()
         msgLog = "Disconnected: " .. MAC
-        idxConnectedDevice = 1
+        SetIdxConnectedDevice(1)
         idxAvailableDevices = 1
         isAvailableDevicesSelected = not table.getn(connectedDevices) == 0
     end
@@ -363,6 +368,17 @@ function TurnOffBluetooth()
     end
 end
 
+function SetIdxConnectedDevice(idx)
+    idxConnectedDevice = idx
+
+    if table.getn(connectedDevices) < idx then
+        itemSelectedType = Bluetooth.ConnectedType.NOTHING
+        return
+    end
+
+    itemSelectedType = connectedDevices[idx].type
+end
+
 function OnKeyPress(key)
     if bottomEventFunc then
         bottomEventFunc(key)
@@ -371,7 +387,7 @@ function OnKeyPress(key)
     if key == "left" or key == "right" then
         isAvailableDevicesSelected = not isAvailableDevicesSelected
         idxAvailableDevices = 1
-        idxConnectedDevice = 1
+        SetIdxConnectedDevice(1)
     elseif key == "up" then
         if isAvailableDevicesSelected then
             if idxAvailableDevices > 1 then
@@ -381,9 +397,9 @@ function OnKeyPress(key)
             end
         else
             if idxConnectedDevice > 1 then
-                idxConnectedDevice = idxConnectedDevice - 1
+                SetIdxConnectedDevice(idxConnectedDevice - 1)
             else
-                idxConnectedDevice = table.getn(connectedDevices)
+                SetIdxConnectedDevice(table.getn(connectedDevices))
             end
         end
     elseif key == "down" then
@@ -395,9 +411,9 @@ function OnKeyPress(key)
             end
         else
             if idxConnectedDevice < table.getn(connectedDevices) then
-                idxConnectedDevice = idxConnectedDevice + 1
+                SetIdxConnectedDevice(idxConnectedDevice + 1)
             else
-                idxConnectedDevice = 1
+                SetIdxConnectedDevice(1)
             end
         end
 

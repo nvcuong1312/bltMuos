@@ -9,6 +9,12 @@ local Bluetooth = {}
 local availableDevices = {}
 local connectedDevices = {}
 
+Bluetooth.ConnectedType = {
+    NOTHING = 0,
+    CONNECTED = 1,
+    PAIRED = 2
+}
+
 function Bluetooth.IsPowerOn()
     if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") ~= "1" then
         os.execute("bluetoothctl show > " .. Config.BLUETOOTH_SHOW_PATH)
@@ -79,7 +85,8 @@ function Bluetooth.GetConnectedDevices()
     connectedDevices = {}
 
     if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") ~= "1" then
-        os.execute("bluetoothctl devices Trusted > " .. Config.CONNECTED_DEVICES_PATH)
+        os.execute("bluetoothctl devices Connected > " .. Config.CONNECTED_DEVICES_PATH)
+        os.execute("bluetoothctl devices Trusted > " .. Config.TRUSTED_DEVICES_PATH)
         socket.sleep(0.5)
     end
 
@@ -89,7 +96,42 @@ function Bluetooth.GetConnectedDevices()
             local lineData = line:gsub("Device ", "")
             local ip, name = lineData:match("([^%s]+)%s+(.*)")
             if StringHelper.IsMACAndNameValid(ip, name) then
-                table.insert(connectedDevices, {ip = ip, name = StringHelper.FormatStringToLarge(name, 17)})
+                table.insert(connectedDevices,
+                {
+                    ip = ip,
+                    name = StringHelper.FormatStringToLarge(name, 17),
+                    type = Bluetooth.ConnectedType.PAIRED
+                })
+
+                for idx, item in ipairs(connectedDevices) do
+                   if item.ip == ip then
+                        item.type = Bluetooth.ConnectedType.CONNECTED
+                   end
+                end
+            end
+        end
+    end
+
+    file = io.open(Config.TRUSTED_DEVICES_PATH, "r")
+    if file then
+        for line in file:lines() do
+            local lineData = line:gsub("Device ", "")
+            local ip, name = lineData:match("([^%s]+)%s+(.*)")
+            if StringHelper.IsMACAndNameValid(ip, name) then
+                local isExisted = false
+                for _, item in ipairs(connectedDevices) do
+                    if item.ip == ip then
+                        isExisted = true
+                    end
+                end
+                if not isExisted then
+                    table.insert(connectedDevices,
+                    {
+                        ip = ip,
+                        name = StringHelper.FormatStringToLarge(name, 17),
+                        type = Bluetooth.ConnectedType.PAIRED
+                    })
+                end
             end
         end
     end
