@@ -272,8 +272,9 @@ function ConnectDevice()
     msgLog = "Connecting..."
     timeRunConnectFunc = love.timer.getTime()
     runConnectFunc = function ()
+        local MAC = ""
         if isAvailableDevicesSelected then
-            local MAC = availableDevices[idxAvailableDevices].ip
+            MAC = availableDevices[idxAvailableDevices].ip
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
 
@@ -293,9 +294,20 @@ function ConnectDevice()
                 end
             end
         else
-            local MAC = connectedDevices[idxConnectedDevice].ip
+            MAC = connectedDevices[idxConnectedDevice].ip
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
+        end
+
+        local isExists = false
+        for device in ipairs(connectedDevices) do
+            if device.ip == MAC then
+                isExists = true
+            end
+        end
+
+        if not isExists then
+            msgLog = "Failed to connect: " .. MAC
         end
 
         isAvailableDevicesSelected = table.getn(availableDevices) > 0
