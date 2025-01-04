@@ -263,7 +263,7 @@ end
 
 function ConnectDevice()
     if (isAvailableDevicesSelected and table.getn(availableDevices) < 1)
-    or (not isAvailableDevicesSelected and itemSelectedType == Bluetooth.ConnectedType.PAIRED) then
+    or (not isAvailableDevicesSelected and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED) then
         return
     end
 
