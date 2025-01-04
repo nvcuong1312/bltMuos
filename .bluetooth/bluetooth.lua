@@ -140,6 +140,10 @@ function Bluetooth.GetConnectedDevices()
 end
 
 function Bluetooth.Disconnect(deviceMAC)
+    os.execute("bluetoothctl disconnect " .. deviceMAC)
+end
+
+function Bluetooth.Remove(deviceMAC)
     os.execute("bluetoothctl remove " .. deviceMAC)
 end
 
