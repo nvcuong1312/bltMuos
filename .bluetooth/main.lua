@@ -597,9 +597,9 @@ function SelectAudio()
         return
     end
 
-    local id = audioList[idxAudio].id
+    Audio.Select(audioList[idxAudio].id)
 
-    Audio.Select(id)
+    msgLog = "Audio: " .. audioList[idxAudio].id .. " " .. audioList[idxAudio].name
 end
 
 function HideAudioSeleciton()
