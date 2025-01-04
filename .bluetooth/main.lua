@@ -565,7 +565,7 @@ function love.gamepadpressed(joystick, button)
     if button == "a" then
         key = "a"
     end
-    if button == "b " then
+    if button == "b" then
         key = "b"
     end
     if button == "x" then
