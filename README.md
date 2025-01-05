@@ -31,3 +31,6 @@ Increase or decrease the volme is now **available**
 ![image](https://github.com/user-attachments/assets/5f118191-e43a-40d1-9915-7c025bb29f94)
 
 ![image](https://github.com/user-attachments/assets/bc304f5f-6490-4ec3-9c3d-92c6e49df8ff)
+
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B716P661)
