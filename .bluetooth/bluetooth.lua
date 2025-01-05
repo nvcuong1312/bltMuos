@@ -159,7 +159,7 @@ function Bluetooth.Connect(deviceMAC)
     -- os.execute("bluetoothctl pair " .. deviceMAC .. " > " .. Config.BLUETOOTH_PAIR_PATH)
     -- os.execute("bluetoothctl connect " .. deviceMAC .. " > " .. Config.BLUETOOTH_CONNECT_PATH)
 
-    local command = string.format("expect bin/bluetooth_expect_script.exp %s > data/testconnect.txt", deviceMAC)
+    local command = string.format("expect %s %s > %s", Config.BLUETOOTH_EXPECT_PATH, deviceMAC, Config.BLUETOOTH_CONNECT_PATH)
     os.execute(command)
 end
 
