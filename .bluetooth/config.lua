@@ -12,6 +12,8 @@ Config.BLUETOOTH_CONNECT_PATH = "data/connect.txt"
 Config.AUDIO_SINK_NUMBER = "data/sinknumber.txt"
 Config.AUDIO_SINKS = "data/sinks.txt"
 
+Config.BLUETOOTH_EXPECT_PATH = "bin/bluetooth_expect_script.exp"
+
 -- Grid
 Config.GRID_PAGE_ITEM = 20
 
