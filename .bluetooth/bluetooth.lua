@@ -74,7 +74,7 @@ function Bluetooth.GetAvailableDevices()
                         table.insert(availableDevices,
                         {
                             ip = ip,
-                            name = StringHelper.FormatStringToLarge(name, 17),
+                            name = StringHelper.FormatStringToLarge(name, 22),
                             fullname = name
                         })
                     end
@@ -104,7 +104,7 @@ function Bluetooth.GetConnectedDevices()
                 table.insert(connectedDevices,
                 {
                     ip = ip,
-                    name = StringHelper.FormatStringToLarge(name, 17),
+                    name = StringHelper.FormatStringToLarge(name, 22),
                     fullname = name,
                     type = Bluetooth.ConnectedType.PAIRED
                 })
@@ -134,7 +134,7 @@ function Bluetooth.GetConnectedDevices()
                     table.insert(connectedDevices,
                     {
                         ip = ip,
-                        name = StringHelper.FormatStringToLarge(name, 17),
+                        name = StringHelper.FormatStringToLarge(name, 22),
                         fullname = name,
                         type = Bluetooth.ConnectedType.PAIRED
                     })

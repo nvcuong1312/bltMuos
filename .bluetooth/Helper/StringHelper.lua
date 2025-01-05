@@ -1,3 +1,5 @@
+local utf8 = require("utf8")
+
 local StringHelper = {}
 
 function StringHelper.IsMACAndNameValid(MAC, Name)
@@ -6,9 +8,15 @@ function StringHelper.IsMACAndNameValid(MAC, Name)
     return s1 ~= s2
 end
 
+local function utf8_sub(s, i, j)
+    local start_byte = utf8.offset(s, i) 
+    local end_byte = utf8.offset(s, j + 1) - 1
+    return string.sub(s, start_byte, end_byte)
+end
+
 function StringHelper.FormatStringToLarge(str, maxLength)
-    if #str > 0 and #str > maxLength then
-        return string.sub(str, 1, maxLength)
+    if #str > maxLength then
+        return utf8_sub(str, 1, maxLength)
     end
 
     return str

@@ -20,4 +20,7 @@ Config.GRID_PAGE_ITEM = 20
 --
 Config.TIMEOUT_LIST = {"3", "5", "10", "15", "20", "25"}
 
+-- Font
+Config.FONT_PATH = "Assets/Font/Font.ttf"
+
 return Config

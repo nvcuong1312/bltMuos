@@ -3,6 +3,7 @@ local love = require("love")
 local Bluetooth = require("bluetooth")
 local Config = require("config")
 local Audio = require("Audio")
+local StringHelper = require("Helper/StringHelper")
 
 local msgLog = ""
 
@@ -41,6 +42,9 @@ local audioList = {}
 
 local isSwitchAudioShow = false
 
+local fontBig
+local fontSmall
+
 function HeaderUI()
     local xPos = 0
     local yPos = 0
@@ -49,8 +53,7 @@ function HeaderUI()
     love.graphics.rectangle("fill", xPos, yPos, 640, 30)
 
     love.graphics.setColor(0.98, 0.98, 0.749)
-    local font = love.graphics.newFont(18)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontBig)
     love.graphics.draw(ic_bluetooth, 640 - 25, yPos + 4)
     love.graphics.print("Bluetooth Settings", xPos + 230, yPos + 5)
 
@@ -59,8 +62,7 @@ function HeaderUI()
     love.graphics.setColor(0.98, 0.98, 0.749, 0.7)
     love.graphics.print(formatted_time, xPos + 10, yPos + 5)
 
-    font = love.graphics.newFont(12)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontSmall)
 end
 
 function AvailableDevicesUI()
@@ -77,7 +79,7 @@ function AvailableDevicesUI()
     if isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
     else love.graphics.setColor(0.247, 0.278, 0.224)
     end
-    
+
     love.graphics.rectangle("fill", xPos, yPos, width, 30)
 
     love.graphics.setColor(1,1,1)
@@ -273,8 +275,7 @@ function ScanTimeoutSelectionUI()
     love.graphics.setColor(0.49, 0.502, 0.49)
     love.graphics.rectangle("fill", xPos,yPos, 300, 30)
 
-    local font = love.graphics.newFont(18)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
     love.graphics.print("Choose timeout", xPos + 80, yPos + 5)
 
@@ -292,8 +293,7 @@ function ScanTimeoutSelectionUI()
         iPos = iPos + 1
     end
 
-    font = love.graphics.newFont(12)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontSmall)
 
     love.graphics.setColor(1,1,1)
     love.graphics.print("A: Continue   B: Close", xPos, yPos + 200)
@@ -316,8 +316,7 @@ function AudioSelectionUI()
     love.graphics.setColor(0.49, 0.502, 0.49)
     love.graphics.rectangle("fill", xPos,yPos, 400, 30)
 
-    local font = love.graphics.newFont(18)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
     love.graphics.print("Select a sound output ", xPos + 80, yPos + 5)
 
@@ -335,8 +334,7 @@ function AudioSelectionUI()
         iPos = iPos + 1
     end
 
-    font = love.graphics.newFont(12)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontSmall)
 
     love.graphics.setColor(1,1,1)
     love.graphics.print("A: Select   B: Close", xPos, yPos + 300)
@@ -414,7 +412,7 @@ function ConnectDevice()
             msgLog = "Connected: " .. MAC
             audioList = Audio.Sinks()
             for idx,item in ipairs(audioList) do
-                if item.name == fullName then
+                if StringHelper.Trim(item.name) == StringHelper.Trim(fullName) then
                     idxAudio = idx
                     isSwitchAudioShow = true
                 end
@@ -545,8 +543,7 @@ function ConfirmAutoSwitchAudioUI()
     love.graphics.setColor(0.49, 0.502, 0.49)
     love.graphics.rectangle("fill", xPos,yPos, 400, 30)
 
-    local font = love.graphics.newFont(18)
-    love.graphics.setFont(font)
+    love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
     love.graphics.print("Confirm", xPos + 150, yPos + 5)
 
@@ -558,6 +555,9 @@ function ConfirmAutoSwitchAudioUI()
 end
 
 function love.load()
+    fontBig = love.graphics.newFont(Config.FONT_PATH, 17)
+    fontSmall = love.graphics.newFont(Config.FONT_PATH, 12)
+
     isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
         LoadConnectedDevices()
