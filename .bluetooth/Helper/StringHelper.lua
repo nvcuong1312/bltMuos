@@ -19,7 +19,7 @@ local function utf8_sub(s, i, j)
 end
 
 function StringHelper.FormatStringToLarge(str, maxLength)
-    if #str > 0 and #str > maxLength then
+    if #str > maxLength then
         return utf8_sub(str, 1, maxLength)
     end
 
