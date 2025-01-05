@@ -9,8 +9,12 @@ function StringHelper.IsMACAndNameValid(MAC, Name)
 end
 
 local function utf8_sub(s, i, j)
-    local start_byte = utf8.offset(s, i) 
-    local end_byte = utf8.offset(s, j + 1) - 1
+    local start_byte = utf8.offset(s, i)
+    local end_byte = utf8.offset(s, j + 1)
+    if end_byte ~= nil then
+        end_byte = utf8.offset(s, j + 1) - 1
+    end
+
     return string.sub(s, start_byte, end_byte)
 end
 
