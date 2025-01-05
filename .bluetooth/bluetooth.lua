@@ -155,9 +155,12 @@ function Bluetooth.Remove(deviceMAC)
 end
 
 function Bluetooth.Connect(deviceMAC)
-    os.execute("bluetoothctl trust " .. deviceMAC .. " > " .. Config.BLUETOOTH_TRUST_PATH)
-    os.execute("bluetoothctl pair " .. deviceMAC .. " > " .. Config.BLUETOOTH_PAIR_PATH)
-    os.execute("bluetoothctl connect " .. deviceMAC .. " > " .. Config.BLUETOOTH_CONNECT_PATH)
+    -- os.execute("bluetoothctl trust " .. deviceMAC .. " > " .. Config.BLUETOOTH_TRUST_PATH)
+    -- os.execute("bluetoothctl pair " .. deviceMAC .. " > " .. Config.BLUETOOTH_PAIR_PATH)
+    -- os.execute("bluetoothctl connect " .. deviceMAC .. " > " .. Config.BLUETOOTH_CONNECT_PATH)
+
+    local command = string.format("expect bin/bluetooth_expect_script.exp %s > data/testconnect.txt", deviceMAC)
+    os.execute(command)
 end
 
 function Bluetooth.Pair(deviceMAC)
