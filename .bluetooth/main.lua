@@ -741,7 +741,9 @@ function love.gamepadpressed(joystick, button)
         end
     end
     else if key == "l1" then
-        ShowAudioSelection()
+        if not isSwitchAudioShow and not isTimeoutShow then
+            ShowAudioSelection()
+        end
     elseif key == "guide" then
         love.event.quit()
         end
