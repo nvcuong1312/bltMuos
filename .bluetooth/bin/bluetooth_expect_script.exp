@@ -5,23 +5,42 @@ set device_mac [lindex $argv 0]
 
 spawn bluetoothctl
 expect "#"
-send "pair $device_mac\r"
+send "info $device_mac\r"
 expect {
-    "Pairing successful" {
-        send "trust $device_mac\r"
-        expect "#"
-        send "connect $device_mac\r"
+    "Paired: yes" {
+        puts "Device is already paired."
+    }
+    "not available" {
+        puts "Device not found. Exiting."
+        send "exit\r"
+        expect eof
+        exit
+    }
+    default {
+        send "pair $device_mac\r"
         expect {
-            "Connection successful" {
-                puts "Device connected successfully."
+            "Pairing successful" {
+                puts "Pairing successful."
+                send "trust $device_mac\r"
+                expect "#"
             }
             timeout {
-                puts "Failed to connect to the device."
+                puts "Pairing failed. Exiting."
+                send "exit\r"
+                expect eof
+                exit
             }
         }
     }
+}
+
+send "connect $device_mac\r"
+expect {
+    "Connection successful" {
+        puts "Device connected successfully."
+    }
     timeout {
-        puts "Pairing failed."
+        puts "Failed to connect to the device."
     }
 }
 send "exit\r"
