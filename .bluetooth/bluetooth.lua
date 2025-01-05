@@ -71,7 +71,12 @@ function Bluetooth.GetAvailableDevices()
                     end
 
                     if isExits == false then
-                        table.insert(availableDevices, {ip = ip, name = StringHelper.FormatStringToLarge(name, 17)})
+                        table.insert(availableDevices,
+                        {
+                            ip = ip,
+                            name = StringHelper.FormatStringToLarge(name, 17),
+                            fullname = name
+                        })
                     end
                 end
             end
@@ -100,10 +105,11 @@ function Bluetooth.GetConnectedDevices()
                 {
                     ip = ip,
                     name = StringHelper.FormatStringToLarge(name, 17),
+                    fullname = name,
                     type = Bluetooth.ConnectedType.PAIRED
                 })
 
-                for idx, item in ipairs(connectedDevices) do
+                for _,item in ipairs(connectedDevices) do
                    if item.ip == ip then
                         item.type = Bluetooth.ConnectedType.CONNECTED
                    end
@@ -129,6 +135,7 @@ function Bluetooth.GetConnectedDevices()
                     {
                         ip = ip,
                         name = StringHelper.FormatStringToLarge(name, 17),
+                        fullname = name,
                         type = Bluetooth.ConnectedType.PAIRED
                     })
                 end

@@ -39,41 +39,7 @@ local isAudioShow = false
 local idxAudio = 1
 local audioList = {}
 
-function love.load()
-    isBluetoothOn = Bluetooth.IsPowerOn()
-    if isBluetoothOn then
-        LoadConnectedDevices()
-
-        if table.getn(connectedDevices) > 0 then
-            isAvailableDevicesSelected = false
-            itemSelectedType = connectedDevices[1].type
-        end
-    end
-
-    ic_bluetooth = love.graphics.newImage("Assets/Icon/ic_bluetooth.png")
-end
-
-function love.draw()
-    love.graphics.setBackgroundColor(0.043, 0.161, 0.094)
-
-    HeaderUI()
-
-    if isBluetoothOn then
-        AvailableDevicesUI()
-        ConnectedDevicesUI()
-    else
-        love.graphics.print("Press [Start] to Power On Bluetooth", 200, 200)
-    end
-
-    BottomButtonUI()
-
-    -- Log MSG
-    love.graphics.rectangle("line", 370, 430, 260, 40)
-    love.graphics.print(msgLog, 380, 442)
-
-    ScanTimeoutSelectionUI()
-    AudioSelectionUI()
-end
+local isSwitchAudioShow = false
 
 function HeaderUI()
     local xPos = 0
@@ -256,6 +222,13 @@ function BottomButtonUI()
                 elseif key == "b" then
                     HideAudioSeleciton()
                 end
+            else if isSwitchAudioShow then
+                if key == "a" then
+                    SelectAudio()
+                    isSwitchAudioShow = false
+                elseif key == "b" then
+                    isSwitchAudioShow = false
+            end
             else
                 if key == "a" then
                     -- Connect
@@ -272,6 +245,7 @@ function BottomButtonUI()
                     end
                 end
             end
+        end
         end
         else
             if key == "start" then
@@ -398,8 +372,10 @@ function ConnectDevice()
     timeRunConnectFunc = love.timer.getTime()
     runConnectFunc = function ()
         local MAC = ""
+        local fullName = ""
         if isAvailableDevicesSelected then
             MAC = availableDevices[idxAvailableDevices].ip
+            fullName = availableDevices[idxAvailableDevices].fullname
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
 
@@ -420,6 +396,7 @@ function ConnectDevice()
             end
         else
             MAC = connectedDevices[idxConnectedDevice].ip
+            fullName = connectedDevices[idxConnectedDevice].fullname
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
         end
@@ -435,6 +412,13 @@ function ConnectDevice()
             msgLog = "Failed to connect: " .. MAC
         else
             msgLog = "Connected: " .. MAC
+            audioList = Audio.Sinks()
+            for idx,item in ipairs(audioList) do
+                if item.name == fullName then
+                    idxAudio = idx
+                    isSwitchAudioShow = true
+                end
+            end
         end
 
         isAvailableDevicesSelected = table.getn(availableDevices) > 0
@@ -517,80 +501,6 @@ function SetIdxConnectedDevice(idx)
     end
 end
 
-function OnKeyPress(key)
-    if bottomEventFunc then
-        bottomEventFunc(key)
-    end
-
-    if key == "left" or key == "right" then
-        isAvailableDevicesSelected = not isAvailableDevicesSelected
-        idxAvailableDevices = 1
-        SetIdxConnectedDevice(1)
-    elseif key == "up" then
-        if isTimeoutShow then
-            if idxTimeout > 1 then
-                idxTimeout = idxTimeout - 1
-            else
-                idxTimeout = table.getn(Config.TIMEOUT_LIST)
-            end
-        else if isAudioShow then
-            if idxAudio > 1 then
-                idxAudio = idxAudio - 1
-            else
-                idxAudio = table.getn(audioList)
-            end
-        else
-            if isAvailableDevicesSelected then
-                if idxAvailableDevices > 1 then
-                    idxAvailableDevices = idxAvailableDevices - 1
-                else
-                    idxAvailableDevices = table.getn(availableDevices)
-                end
-            else
-                if idxConnectedDevice > 1 then
-                    SetIdxConnectedDevice(idxConnectedDevice - 1)
-                else
-                    SetIdxConnectedDevice(table.getn(connectedDevices))
-                end
-            end
-        end
-    end
-    elseif key == "down" then
-        if isTimeoutShow then
-            if idxTimeout < table.getn(Config.TIMEOUT_LIST) then
-                idxTimeout = idxTimeout + 1
-            else
-                idxTimeout = 1
-            end
-        else if isAudioShow then
-            if idxAudio < table.getn(audioList) then
-                idxAudio = idxAudio + 1
-            else
-                idxAudio = 1
-            end
-        else
-            if isAvailableDevicesSelected then
-                if idxAvailableDevices < table.getn(availableDevices) then
-                    idxAvailableDevices = idxAvailableDevices + 1
-                else
-                    idxAvailableDevices = 1
-                end
-            else
-                if idxConnectedDevice < table.getn(connectedDevices) then
-                    SetIdxConnectedDevice(idxConnectedDevice + 1)
-                else
-                    SetIdxConnectedDevice(1)
-                end
-            end
-        end
-    end
-    else if key == "l1" then
-        ShowAudioSelection()
-    elseif key == "guide" then
-        love.event.quit()
-        end
-    end
-end
 
 function SelectAudio()
     if table.getn(audioList) < idxAudio then
@@ -615,9 +525,73 @@ function ShowAudioSelection()
         end
     end
 
-    msgLog = defSinkNumber .." " ..idxAudio
-
     isAudioShow = true
+end
+
+function ConfirmAutoSwitchAudioUI()
+    if not isSwitchAudioShow then
+        return
+    end
+
+    local xPos = 140
+    local yPos = 100
+
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.rectangle("fill", 0,0, 640, 480)
+
+    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 100)
+
+    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 30)
+
+    local font = love.graphics.newFont(18)
+    love.graphics.setFont(font)
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.print("Confirm", xPos + 150, yPos + 5)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Do you want to change the audio output?", xPos + 10, yPos + 50)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("A: Yes   B: No", xPos, yPos + 100)
+end
+
+function love.load()
+    isBluetoothOn = Bluetooth.IsPowerOn()
+    if isBluetoothOn then
+        LoadConnectedDevices()
+
+        if table.getn(connectedDevices) > 0 then
+            isAvailableDevicesSelected = false
+            itemSelectedType = connectedDevices[1].type
+        end
+    end
+
+    ic_bluetooth = love.graphics.newImage("Assets/Icon/ic_bluetooth.png")
+end
+
+function love.draw()
+    love.graphics.setBackgroundColor(0.043, 0.161, 0.094)
+
+    HeaderUI()
+
+    if isBluetoothOn then
+        AvailableDevicesUI()
+        ConnectedDevicesUI()
+    else
+        love.graphics.print("Press [Start] to Power On Bluetooth", 200, 200)
+    end
+
+    BottomButtonUI()
+
+    -- Log MSG
+    love.graphics.rectangle("line", 370, 430, 260, 40)
+    love.graphics.print(msgLog, 380, 442)
+
+    ScanTimeoutSelectionUI()
+    AudioSelectionUI()
+    ConfirmAutoSwitchAudioUI()
 end
 
 function love.update(dt)
@@ -698,3 +672,78 @@ function love.gamepadpressed(joystick, button)
 
     OnKeyPress(key)
  end
+
+ function OnKeyPress(key)
+    if bottomEventFunc then
+        bottomEventFunc(key)
+    end
+
+    if key == "left" or key == "right" then
+        isAvailableDevicesSelected = not isAvailableDevicesSelected
+        idxAvailableDevices = 1
+        SetIdxConnectedDevice(1)
+    elseif key == "up" then
+        if isTimeoutShow then
+            if idxTimeout > 1 then
+                idxTimeout = idxTimeout - 1
+            else
+                idxTimeout = table.getn(Config.TIMEOUT_LIST)
+            end
+        else if isAudioShow then
+            if idxAudio > 1 then
+                idxAudio = idxAudio - 1
+            else
+                idxAudio = table.getn(audioList)
+            end
+        else
+            if isAvailableDevicesSelected then
+                if idxAvailableDevices > 1 then
+                    idxAvailableDevices = idxAvailableDevices - 1
+                else
+                    idxAvailableDevices = table.getn(availableDevices)
+                end
+            else
+                if idxConnectedDevice > 1 then
+                    SetIdxConnectedDevice(idxConnectedDevice - 1)
+                else
+                    SetIdxConnectedDevice(table.getn(connectedDevices))
+                end
+            end
+        end
+    end
+    elseif key == "down" then
+        if isTimeoutShow then
+            if idxTimeout < table.getn(Config.TIMEOUT_LIST) then
+                idxTimeout = idxTimeout + 1
+            else
+                idxTimeout = 1
+            end
+        else if isAudioShow then
+            if idxAudio < table.getn(audioList) then
+                idxAudio = idxAudio + 1
+            else
+                idxAudio = 1
+            end
+        else
+            if isAvailableDevicesSelected then
+                if idxAvailableDevices < table.getn(availableDevices) then
+                    idxAvailableDevices = idxAvailableDevices + 1
+                else
+                    idxAvailableDevices = 1
+                end
+            else
+                if idxConnectedDevice < table.getn(connectedDevices) then
+                    SetIdxConnectedDevice(idxConnectedDevice + 1)
+                else
+                    SetIdxConnectedDevice(1)
+                end
+            end
+        end
+    end
+    else if key == "l1" then
+        ShowAudioSelection()
+    elseif key == "guide" then
+        love.event.quit()
+        end
+    end
+end
