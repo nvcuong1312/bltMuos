@@ -11,9 +11,11 @@ local isBluetoothOn = false
 
 local isAvailableDevicesSelected = false
 
+local currAvailableDevicePage = 1
 local idxAvailableDevices = 1
 local availableDevices = {}
 
+local currConnectedDevicePage = 1
 local idxConnectedDevice = 1
 local connectedDevices = {}
 local titleConnectedDevice = ""
@@ -102,21 +104,25 @@ function AvailableDevicesUI()
     love.graphics.setColor(1,1,1)
     love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
 
-    for idx, device in ipairs(availableDevices) do
-        if idx > Config.GRID_PAGE_ITEM then
-            goto continue
-        end
+    local total = table.getn(availableDevices)
+    local idxStart = currAvailableDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
+    local idxEnd = currAvailableDevicePage * Config.GRID_PAGE_ITEM
+
+    local iPos = 0
+    for idx = idxStart, idxEnd do
+        if idx > total then break end
 
         if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
             love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 65, width, 15)
+            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 65)
+        love.graphics.setColor(1,1,1)
+        love.graphics.print(availableDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
+        love.graphics.print(availableDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
+
         iPos = iPos + 1
-        ::continue::
     end
 
     love.graphics.setColor(1,1,1)
@@ -155,7 +161,6 @@ function ConnectedDevicesUI()
 
     love.graphics.print(titleConnectedDevice, xPos + 120, yPos + 7)
 
-    local iPos = 0
     local lineHeight = 15
     love.graphics.setColor(0.169, 0.259, 0.11)
     love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
@@ -172,22 +177,25 @@ function ConnectedDevicesUI()
     love.graphics.setColor(1,1,1)
     love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
 
+    local total = table.getn(connectedDevices)
+    local idxStart = currConnectedDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
+    local idxEnd = currConnectedDevicePage * Config.GRID_PAGE_ITEM
 
-    for idx, device in ipairs(connectedDevices) do
-        if idx > Config.GRID_PAGE_ITEM then
-            goto continue
-        end
+    local iPos = 0
+    for idx = idxStart, idxEnd do
+        if idx > total then break end
 
         if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
             love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 65, width, 15)
+            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print(device.ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(device.name, xPos + 150, iPos * lineHeight + yPos + 65)
+        love.graphics.setColor(1,1,1)
+        love.graphics.print(connectedDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
+        love.graphics.print(connectedDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
+
         iPos = iPos + 1
-        ::continue::
     end
 
     love.graphics.setColor(1,1,1)
@@ -462,6 +470,7 @@ end
 
 function LoadConnectedDevices()
     connectedDevices = Bluetooth.GetConnectedDevices()
+    currConnectedDevicePage = 1
 end
 
 function TurnOnBluetooth()
@@ -482,6 +491,10 @@ function TurnOffBluetooth()
     else
         msgLog = "Bluetooth: Stopped Failed"
     end
+end
+
+function SetIdxAvailableDevice(idx)
+    idxAvailableDevices = idx
 end
 
 function SetIdxConnectedDevice(idx)
@@ -697,17 +710,9 @@ function love.gamepadpressed(joystick, button)
             end
         else
             if isAvailableDevicesSelected then
-                if idxAvailableDevices > 1 then
-                    idxAvailableDevices = idxAvailableDevices - 1
-                else
-                    idxAvailableDevices = table.getn(availableDevices)
-                end
+                AvailableDeviceKeyup()
             else
-                if idxConnectedDevice > 1 then
-                    SetIdxConnectedDevice(idxConnectedDevice - 1)
-                else
-                    SetIdxConnectedDevice(table.getn(connectedDevices))
-                end
+                ConnectedDeviceKeyup()
             end
         end
     end
@@ -726,17 +731,9 @@ function love.gamepadpressed(joystick, button)
             end
         else
             if isAvailableDevicesSelected then
-                if idxAvailableDevices < table.getn(availableDevices) then
-                    idxAvailableDevices = idxAvailableDevices + 1
-                else
-                    idxAvailableDevices = 1
-                end
+                AvailableDeviceKeydown()
             else
-                if idxConnectedDevice < table.getn(connectedDevices) then
-                    SetIdxConnectedDevice(idxConnectedDevice + 1)
-                else
-                    SetIdxConnectedDevice(1)
-                end
+                ConnectedDeviceKeydown()
             end
         end
     end
@@ -746,6 +743,154 @@ function love.gamepadpressed(joystick, button)
         end
     elseif key == "guide" then
         love.event.quit()
+        end
+    end
+end
+
+function AvailableDeviceKeyup()
+    local total = table.getn(availableDevices)
+    local isMultiplePage = total > Config.GRID_PAGE_ITEM
+    if isMultiplePage then
+        local remainder = total % Config.GRID_PAGE_ITEM
+        local totalPage = 1
+        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
+        if remainder > 0 then
+            totalPage =  q + 1
+        else
+            totalPage = q
+        end
+
+        if currAvailableDevicePage > 1 then
+            if idxAvailableDevices > 1 then
+                SetIdxAvailableDevice(idxAvailableDevices - 1)
+            else
+                currAvailableDevicePage = currAvailableDevicePage - 1
+                SetIdxAvailableDevice(Config.GRID_PAGE_ITEM)
+            end
+        else
+            if idxAvailableDevices > 1 then
+                SetIdxAvailableDevice(idxAvailableDevices - 1)
+            else
+                currAvailableDevicePage = totalPage
+                SetIdxAvailableDevice(remainder)
+            end
+        end
+    else
+        if idxAvailableDevices > 1 then
+            SetIdxAvailableDevice(idxAvailableDevices - 1)
+        else
+            SetIdxAvailableDevice(total)
+        end
+    end
+end
+
+function AvailableDeviceKeydown()
+    local total = table.getn(availableDevices)
+    local isMultiplePage = total > Config.GRID_PAGE_ITEM
+    if isMultiplePage then
+        local remainder = total % Config.GRID_PAGE_ITEM
+        local totalPage = 1
+        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
+        if remainder > 0 then
+            totalPage =  q + 1
+        else
+            totalPage = q
+        end
+
+        if currAvailableDevicePage < totalPage then
+            if idxAvailableDevices < Config.GRID_PAGE_ITEM then
+                SetIdxAvailableDevice(idxAvailableDevices + 1)
+            else
+                currAvailableDevicePage = currAvailableDevicePage + 1
+                SetIdxAvailableDevice(1)
+            end
+        else
+            if  idxAvailableDevices < remainder then
+                SetIdxAvailableDevice(idxAvailableDevices + 1)
+            else
+                currAvailableDevicePage = 1
+                SetIdxAvailableDevice(1)
+            end
+        end
+    else
+        if idxAvailableDevices < total then
+            SetIdxAvailableDevice(idxAvailableDevices + 1)
+        else
+            SetIdxAvailableDevice(1)
+        end
+    end
+end
+
+function ConnectedDeviceKeyup()
+    local total = table.getn(connectedDevices)
+    local isMultiplePage = total > Config.GRID_PAGE_ITEM
+    if isMultiplePage then
+        local remainder = total % Config.GRID_PAGE_ITEM
+        local totalPage = 1
+        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
+        if remainder > 0 then
+            totalPage =  q + 1
+        else
+            totalPage = q
+        end
+
+        if currConnectedDevicePage > 1 then
+            if idxConnectedDevice > 1 then
+                SetIdxConnectedDevice(idxConnectedDevice - 1)
+            else
+                currConnectedDevicePage = currConnectedDevicePage - 1
+                SetIdxConnectedDevice(Config.GRID_PAGE_ITEM)
+            end
+        else
+            if idxConnectedDevice > 1 then
+                SetIdxConnectedDevice(idxConnectedDevice - 1)
+            else
+                currConnectedDevicePage = totalPage
+                SetIdxConnectedDevice(remainder)
+            end
+        end
+    else
+        if idxConnectedDevice > 1 then
+            SetIdxConnectedDevice(idxConnectedDevice - 1)
+        else
+            SetIdxConnectedDevice(total)
+        end
+    end
+end
+
+function ConnectedDeviceKeydown()
+    local total = table.getn(connectedDevices)
+    local isMultiplePage = total > Config.GRID_PAGE_ITEM
+    if isMultiplePage then
+        local remainder = total % Config.GRID_PAGE_ITEM
+        local totalPage = 1
+        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
+        if remainder > 0 then
+            totalPage =  q + 1
+        else
+            totalPage = q
+        end
+
+        if currConnectedDevicePage < totalPage then
+            if idxConnectedDevice < Config.GRID_PAGE_ITEM then
+                SetIdxConnectedDevice(idxConnectedDevice + 1)
+            else
+                currConnectedDevicePage = currConnectedDevicePage + 1
+                SetIdxConnectedDevice(1)
+            end
+        else
+            if  idxConnectedDevice < remainder then
+                SetIdxConnectedDevice(idxConnectedDevice + 1)
+            else
+                currConnectedDevicePage = 1
+                SetIdxConnectedDevice(1)
+            end
+        end
+    else
+        if idxConnectedDevice < total then
+            SetIdxConnectedDevice(idxConnectedDevice + 1)
+        else
+            SetIdxConnectedDevice(1)
         end
     end
 end
