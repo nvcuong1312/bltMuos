@@ -500,13 +500,14 @@ end
 function SetIdxConnectedDevice(idx)
     idxConnectedDevice = idx
 
-    if table.getn(connectedDevices) < idx then
+    local iPos = (currConnectedDevicePage - 1) * Config.GRID_PAGE_ITEM + idx
+    if table.getn(connectedDevices) < iPos then
         itemSelectedType = Bluetooth.ConnectedType.NOTHING
         txtDisconnectRemoveBtn = "Disconnect"
         return
     end
 
-    itemSelectedType = connectedDevices[idx].type
+    itemSelectedType = connectedDevices[iPos].type
     if itemSelectedType == Bluetooth.ConnectedType.CONNECTED then txtDisconnectRemoveBtn = "Disconnect"
     else txtDisconnectRemoveBtn = "Remove"
     end
