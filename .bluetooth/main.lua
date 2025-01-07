@@ -22,8 +22,6 @@ local titleConnectedDevice = ""
 local itemSelectedType = Bluetooth.ConnectedType.NOTHING
 local txtDisconnectRemoveBtn = ""
 
-local bottomEventFunc
-
 local runScanFunc
 local timeRunScanFunc = 0
 
@@ -43,6 +41,8 @@ local idxAudio = 1
 local audioList = {}
 
 local isSwitchAudioShow = false
+
+local isQuitConfirm = false
 
 local fontBig
 local fontSmall
@@ -67,140 +67,6 @@ function HeaderUI()
     love.graphics.setFont(fontSmall)
 end
 
-function AvailableDevicesUI()
-    -- UI
-    local xPos = 0
-    local yPos = 30
-    local width = 320
-    local height = 370
-
-    love.graphics.setColor(0.102, 0.141, 0.078)
-    love.graphics.rectangle("fill", xPos, yPos, width, height)
-
-    -- Header
-    if isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
-    else love.graphics.setColor(0.247, 0.278, 0.224)
-    end
-
-    love.graphics.rectangle("fill", xPos, yPos, width, 30)
-
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("Available", xPos + 120, yPos + 7)
-
-    local iPos = 0
-    local lineHeight = 15
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
-
-    love.graphics.setColor(0.169, 0.259, 0.212)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
-    
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
-    
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
-
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
-
-    local total = table.getn(availableDevices)
-    local idxStart = currAvailableDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
-    local idxEnd = currAvailableDevicePage * Config.GRID_PAGE_ITEM
-
-    local iPos = 0
-    for idx = idxStart, idxEnd do
-        if idx > total then break end
-
-        if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
-            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
-            love.graphics.setColor(1,1,1)
-        end
-
-        love.graphics.setColor(1,1,1)
-        love.graphics.print(availableDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(availableDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
-
-        iPos = iPos + 1
-    end
-
-    love.graphics.setColor(1,1,1)
-end
-
-function ConnectedDevicesUI()
-    -- UI
-    local xPos = 320
-    local yPos = 30
-    local width = 320
-    local height = 370
-
-    love.graphics.setColor(0.114, 0.149, 0.094)
-    love.graphics.rectangle("fill", xPos, yPos, width, height, 5, 5, 10)
-
-    -- Header
-    if not isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
-    else love.graphics.setColor(0.247, 0.278, 0.224)
-    end
-
-    love.graphics.rectangle("fill", xPos, yPos, width, 30)
-
-    love.graphics.setColor(1,1,1)
-    if isAvailableDevicesSelected then
-        titleConnectedDevice = "Connected/Paired"
-    else
-        if itemSelectedType == Bluetooth.ConnectedType.CONNECTED then
-            titleConnectedDevice = "Connected"
-        else if itemSelectedType == Bluetooth.ConnectedType.PAIRED then
-            titleConnectedDevice = "Paired"
-        else
-            titleConnectedDevice = "Connected/Paired"
-            end
-        end
-    end
-
-    love.graphics.print(titleConnectedDevice, xPos + 120, yPos + 7)
-
-    local lineHeight = 15
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
-
-    love.graphics.setColor(0.169, 0.259, 0.212)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
-
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
-
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
-
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
-
-    local total = table.getn(connectedDevices)
-    local idxStart = currConnectedDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
-    local idxEnd = currConnectedDevicePage * Config.GRID_PAGE_ITEM
-
-    local iPos = 0
-    for idx = idxStart, idxEnd do
-        if idx > total then break end
-
-        if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
-            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
-            love.graphics.setColor(1,1,1)
-        end
-
-        love.graphics.setColor(1,1,1)
-        love.graphics.print(connectedDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(connectedDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
-
-        iPos = iPos + 1
-    end
-
-    love.graphics.setColor(1,1,1)
-end
-
 function BottomButtonUI()
     local xPos = 10
     local yPos = 435
@@ -210,60 +76,21 @@ function BottomButtonUI()
     love.graphics.print("[Y]: Scan", xPos + 100, yPos)
     love.graphics.print("[A]: Connect", xPos, yPos)
     love.graphics.print("[X]: " .. txtDisconnectRemoveBtn, xPos, yPos + 20)
-    love.graphics.print("[Menu]: Quit",  xPos + 100, yPos + 20)
+    love.graphics.print("[B]: Quit",  xPos + 100, yPos + 20)
     love.graphics.print("[Start]  : ON",  xPos + 180, yPos)
     love.graphics.print("[Select]: OFF", xPos + 180, yPos + 20)
     love.graphics.print("[L1]: Audio",  xPos + 265, yPos + 20)
 
     -- Event
-    bottomEventFunc = function(key)
-        if isBluetoothOn then
-            if isTimeoutShow then
-                if key == "a" then
-                    Scan()
-                    HideScanTimeoutUI()
-                elseif key == "b" then
-                    HideScanTimeoutUI()
-                end
-            else if isAudioShow then
-                if key == "a" then
-                    SelectAudio()
-                    HideAudioSeleciton()
-                elseif key == "b" then
-                    HideAudioSeleciton()
-                end
-            else if isSwitchAudioShow then
-                if key == "a" then
-                    SelectAudio()
-                    isSwitchAudioShow = false
-                elseif key == "b" then
-                    isSwitchAudioShow = false
-            end
-            else
-                if key == "a" then
-                    -- Connect
-                    ConnectDevice()
-                elseif key == "x" then
-                    -- Disconnect
-                    DisconnectDevice()
-                elseif key == "select" then
-                    -- PowerOff
-                    TurnOffBluetooth()
-                else if key == "y" then
-                    -- Scan
-                    ShowScanTimeoutUI()
-                    end
-                end
-            end
-        end
-        end
-        else
-            if key == "start" then
-                -- PowerOn
-                TurnOnBluetooth()
-            end
-        end
-    end
+end
+
+-- Scan
+function ShowScanTimeoutUI()
+    isTimeoutShow = true
+end
+
+function HideScanTimeoutUI()
+    isTimeoutShow = false
 end
 
 function ScanTimeoutSelectionUI()
@@ -307,6 +134,33 @@ function ScanTimeoutSelectionUI()
     love.graphics.print("A: Continue   B: Close", xPos, yPos + 200)
 end
 
+function Scan()
+    msgLog = "Scanning..."
+    timeRunScanFunc = love.timer.getTime()
+    runScanFunc = function ()
+        LoadAvailableDevices()
+        LoadConnectedDevices()
+        isAvailableDevicesSelected = table.getn(availableDevices) > 0
+    end
+end
+
+-- Audio
+function ShowAudioSelection()
+    audioList = Audio.Sinks()
+    local defSinkNumber = Audio.DefaultSinkNumber()
+    for idx,item in ipairs(audioList) do
+        if item.id == defSinkNumber then
+            idxAudio = idx
+        end
+    end
+
+    isAudioShow = true
+end
+
+function HideAudioSeleciton()
+    isAudioShow = false
+end
+
 function AudioSelectionUI()
     if not isAudioShow then
         return
@@ -348,21 +202,62 @@ function AudioSelectionUI()
     love.graphics.print("A: Select   B: Close", xPos, yPos + 300)
 end
 
-function ShowScanTimeoutUI()
-    isTimeoutShow = true
+function SelectAudio()
+    if table.getn(audioList) < idxAudio then
+        return
+    end
+
+    Audio.Select(audioList[idxAudio].id)
+
+    msgLog = "Audio: " .. audioList[idxAudio].id .. " " .. audioList[idxAudio].name
 end
 
-function HideScanTimeoutUI()
-    isTimeoutShow = false
+function ConfirmAutoSwitchAudioUI()
+    if not isSwitchAudioShow then
+        return
+    end
+
+    local xPos = 140
+    local yPos = 100
+
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.rectangle("fill", 0,0, 640, 480)
+
+    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 100)
+
+    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 30)
+
+    love.graphics.setFont(fontBig)
+    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.print("Confirm", xPos + 150, yPos + 5)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Do you want to change the audio output?", xPos + 10, yPos + 50)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("A: Yes   B: No", xPos, yPos + 100)
 end
 
-function Scan()
-    msgLog = "Scanning..."
-    timeRunScanFunc = love.timer.getTime()
-    runScanFunc = function ()
-        LoadAvailableDevices()
-        LoadConnectedDevices()
-        isAvailableDevicesSelected = table.getn(availableDevices) > 0
+-- Bluetooth
+function TurnOnBluetooth()
+    Bluetooth.PowerOn()
+    isBluetoothOn = Bluetooth.IsPowerOn()
+    if isBluetoothOn then
+        msgLog = "Bluetooth: Started"
+    else
+        msgLog = "Bluetooth: Started Failed"
+    end
+end
+
+function TurnOffBluetooth()
+    Bluetooth.PowerOff()
+    isBluetoothOn = Bluetooth.IsPowerOn()
+    if isBluetoothOn == false then
+        msgLog = "Bluetooth: Stopped"
+    else
+        msgLog = "Bluetooth: Stopped Failed"
     end
 end
 
@@ -461,6 +356,68 @@ function DisconnectDevice()
     end
 end
 
+-- Available Devices
+function AvailableDevicesUI()
+    -- UI
+    local xPos = 0
+    local yPos = 30
+    local width = 320
+    local height = 370
+
+    love.graphics.setColor(0.102, 0.141, 0.078)
+    love.graphics.rectangle("fill", xPos, yPos, width, height)
+
+    -- Header
+    if isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
+    else love.graphics.setColor(0.247, 0.278, 0.224)
+    end
+
+    love.graphics.rectangle("fill", xPos, yPos, width, 30)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Available", xPos + 120, yPos + 7)
+
+    local iPos = 0
+    local lineHeight = 15
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
+
+    love.graphics.setColor(0.169, 0.259, 0.212)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
+    
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
+    
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
+
+    local total = table.getn(availableDevices)
+    local idxStart = currAvailableDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
+    local idxEnd = currAvailableDevicePage * Config.GRID_PAGE_ITEM
+
+    local iPos = 0
+    for idx = idxStart, idxEnd do
+        if idx > total then break end
+
+        if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
+            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
+            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
+            love.graphics.setColor(1,1,1)
+        end
+
+        love.graphics.setColor(1,1,1)
+        love.graphics.print(availableDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
+        love.graphics.print(availableDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
+
+        iPos = iPos + 1
+    end
+
+    love.graphics.setColor(1,1,1)
+end
+
 function LoadAvailableDevices()
     local timeout = Config.TIMEOUT_LIST[idxTimeout]
     Bluetooth.ScanDevices(timeout)
@@ -468,33 +425,91 @@ function LoadAvailableDevices()
     msgLog = "Scanning complete!!!"
 end
 
+function SetIdxAvailableDevice(idx)
+    idxAvailableDevices = idx
+end
+
+function ChangeAvailableDevicePage(page)
+    currAvailableDevicePage = page
+end
+
+-- Connected Devices
+function ConnectedDevicesUI()
+    -- UI
+    local xPos = 320
+    local yPos = 30
+    local width = 320
+    local height = 370
+
+    love.graphics.setColor(0.114, 0.149, 0.094)
+    love.graphics.rectangle("fill", xPos, yPos, width, height, 5, 5, 10)
+
+    -- Header
+    if not isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
+    else love.graphics.setColor(0.247, 0.278, 0.224)
+    end
+
+    love.graphics.rectangle("fill", xPos, yPos, width, 30)
+
+    love.graphics.setColor(1,1,1)
+    if isAvailableDevicesSelected then
+        titleConnectedDevice = "Connected/Paired"
+    else
+        if itemSelectedType == Bluetooth.ConnectedType.CONNECTED then
+            titleConnectedDevice = "Connected"
+        else if itemSelectedType == Bluetooth.ConnectedType.PAIRED then
+            titleConnectedDevice = "Paired"
+        else
+            titleConnectedDevice = "Connected/Paired"
+            end
+        end
+    end
+
+    love.graphics.print(titleConnectedDevice, xPos + 120, yPos + 7)
+
+    local lineHeight = 15
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
+
+    love.graphics.setColor(0.169, 0.259, 0.212)
+    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
+
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
+
+    local total = table.getn(connectedDevices)
+    local idxStart = currConnectedDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
+    local idxEnd = currConnectedDevicePage * Config.GRID_PAGE_ITEM
+
+    local iPos = 0
+    for idx = idxStart, idxEnd do
+        if idx > total then break end
+
+        if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
+            love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
+            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
+            love.graphics.setColor(1,1,1)
+        end
+
+        love.graphics.setColor(1,1,1)
+        love.graphics.print(connectedDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
+        love.graphics.print(connectedDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
+
+        iPos = iPos + 1
+    end
+
+    love.graphics.setColor(1,1,1)
+end
+
 function LoadConnectedDevices()
     connectedDevices = Bluetooth.GetConnectedDevices()
     currConnectedDevicePage = 1
-end
-
-function TurnOnBluetooth()
-    Bluetooth.PowerOn()
-    isBluetoothOn = Bluetooth.IsPowerOn()
-    if isBluetoothOn then
-        msgLog = "Bluetooth: Started"
-    else
-        msgLog = "Bluetooth: Started Failed"
-    end
-end
-
-function TurnOffBluetooth()
-    Bluetooth.PowerOff()
-    isBluetoothOn = Bluetooth.IsPowerOn()
-    if isBluetoothOn == false then
-        msgLog = "Bluetooth: Stopped"
-    else
-        msgLog = "Bluetooth: Stopped Failed"
-    end
-end
-
-function SetIdxAvailableDevice(idx)
-    idxAvailableDevices = idx
 end
 
 function SetIdxConnectedDevice(idx)
@@ -513,37 +528,13 @@ function SetIdxConnectedDevice(idx)
     end
 end
 
-
-function SelectAudio()
-    if table.getn(audioList) < idxAudio then
-        return
-    end
-
-    Audio.Select(audioList[idxAudio].id)
-
-    msgLog = "Audio: " .. audioList[idxAudio].id .. " " .. audioList[idxAudio].name
+function ChangeConnectedDevicePage(page)
+    currConnectedDevicePage = page
 end
 
-function HideAudioSeleciton()
-    isAudioShow = false
-end
-
-function ShowAudioSelection()
-    audioList = Audio.Sinks()
-    local defSinkNumber = Audio.DefaultSinkNumber()
-    for idx,item in ipairs(audioList) do
-        if item.id == defSinkNumber then
-            idxAudio = idx
-        end
-    end
-
-    isAudioShow = true
-end
-
-function ConfirmAutoSwitchAudioUI()
-    if not isSwitchAudioShow then
-        return
-    end
+-- Quit Confirm
+function ShowQuitConfirmUI()
+    if not isQuitConfirm then return end
 
     local xPos = 140
     local yPos = 100
@@ -562,11 +553,13 @@ function ConfirmAutoSwitchAudioUI()
     love.graphics.print("Confirm", xPos + 150, yPos + 5)
 
     love.graphics.setColor(1,1,1)
-    love.graphics.print("Do you want to change the audio output?", xPos + 10, yPos + 50)
+    love.graphics.print("Are you sure you want to exit?", xPos + 10, yPos + 50)
 
     love.graphics.setColor(1,1,1)
     love.graphics.print("A: Yes   B: No", xPos, yPos + 100)
 end
+
+-- Love
 
 function love.load()
     fontBig = love.graphics.newFont(Config.FONT_PATH, 17)
@@ -606,6 +599,7 @@ function love.draw()
     ScanTimeoutSelectionUI()
     AudioSelectionUI()
     ConfirmAutoSwitchAudioUI()
+    ShowQuitConfirmUI()
 end
 
 function love.update(dt)
@@ -688,210 +682,220 @@ function love.gamepadpressed(joystick, button)
  end
 
  function OnKeyPress(key)
-    if bottomEventFunc then
-        bottomEventFunc(key)
+    if isSwitchAudioShow then
+        if key == "a" then
+            SelectAudio()
+            isSwitchAudioShow = false
+            return
+        end
+
+        if key == "b" then
+            isSwitchAudioShow = false
+            return
+        end
+    end
+
+    if isTimeoutShow then
+        if key == "a" then
+            Scan()
+            HideScanTimeoutUI()
+            return
+        end
+
+        if key == "b" then
+            HideScanTimeoutUI()
+            return
+        end
+
+        if key == "up" then
+            GridKeyUp(Config.TIMEOUT_LIST, 1, idxTimeout, 6, function (idx) idxTimeout = idx end)
+            return
+        end
+
+        if key == "down" then
+            GridKeyDown(Config.TIMEOUT_LIST, 1, idxTimeout, 6, function (idx) idxTimeout = idx end)
+            return
+        end
+    end
+
+    if isAudioShow then
+        if key == "a" then
+            SelectAudio()
+            HideAudioSeleciton()
+            return
+        end
+
+        if key == "b" then
+            HideAudioSeleciton()
+            return
+        end
+
+        if key == "up" then
+            GridKeyUp(audioList, 1, idxAudio, 5, function (idx) idxAudio = idx end)
+            return
+        end
+
+        if key == "down" then
+            GridKeyDown(audioList, 1, idxAudio, 10, function (idx) idxAudio = idx end)
+            return
+        end
+    end
+
+    if isAvailableDevicesSelected then
+        if key == "up" then
+            GridKeyUp(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
+            return
+        end
+
+        if key == "down" then
+            GridKeyDown(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
+            return
+        end
+    end
+
+    if not isAvailableDevicesSelected then
+        if key == "up" then
+            GridKeyUp(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
+            return
+        end
+
+        if key == "down" then
+            GridKeyDown(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
+            return
+        end
+    end
+
+    if isQuitConfirm then
+        if key == "a" then
+            love.event.quit()
+           return 
+        end
+
+        if key == "b" then
+            isQuitConfirm = false
+            return
+        end
+    end
+
+    if isBluetoothOn then
+        if key == "a" then
+            -- Connect
+            ConnectDevice()
+            return
+        elseif key == "x" then
+            -- Disconnect
+            DisconnectDevice()
+            return
+        elseif key == "select" then
+            -- PowerOff
+            TurnOffBluetooth()
+            return
+        else if key == "y" then
+            -- Scan
+            ShowScanTimeoutUI()
+            return
+        end
+    end
+    else
+        if key == "start" then
+            -- PowerOn
+            TurnOnBluetooth()
+            return
+        end
     end
 
     if key == "left" or key == "right" then
         isAvailableDevicesSelected = not isAvailableDevicesSelected
         idxAvailableDevices = 1
         SetIdxConnectedDevice(1)
-    elseif key == "up" then
-        if isTimeoutShow then
-            if idxTimeout > 1 then
-                idxTimeout = idxTimeout - 1
-            else
-                idxTimeout = table.getn(Config.TIMEOUT_LIST)
-            end
-        else if isAudioShow then
-            if idxAudio > 1 then
-                idxAudio = idxAudio - 1
-            else
-                idxAudio = table.getn(audioList)
-            end
-        else
-            if isAvailableDevicesSelected then
-                AvailableDeviceKeyup()
-            else
-                ConnectedDeviceKeyup()
-            end
-        end
+        return
     end
-    elseif key == "down" then
-        if isTimeoutShow then
-            if idxTimeout < table.getn(Config.TIMEOUT_LIST) then
-                idxTimeout = idxTimeout + 1
-            else
-                idxTimeout = 1
-            end
-        else if isAudioShow then
-            if idxAudio < table.getn(audioList) then
-                idxAudio = idxAudio + 1
-            else
-                idxAudio = 1
-            end
-        else
-            if isAvailableDevicesSelected then
-                AvailableDeviceKeydown()
-            else
-                ConnectedDeviceKeydown()
-            end
-        end
-    end
-    else if key == "l1" then
+
+    if key == "l1" then
         if not isSwitchAudioShow and not isTimeoutShow then
             ShowAudioSelection()
+            return
         end
-    elseif key == "guide" then
-        love.event.quit()
+    elseif key == "b" then
+        if not isAudioShow and not isSwitchAudioShow and not isTimeoutShow then
+            isQuitConfirm = true
+            return
         end
     end
 end
 
-function AvailableDeviceKeyup()
-    local total = table.getn(availableDevices)
-    local isMultiplePage = total > Config.GRID_PAGE_ITEM
+-- GridKey Up/Down
+
+function GridKeyUp(list,currPage, idxCurr, maxPageItem, callBackSetIdx, callBackChangeCurrPage)
+    local total = table.getn(list)
+    local isMultiplePage = total > maxPageItem
     if isMultiplePage then
-        local remainder = total % Config.GRID_PAGE_ITEM
+        local remainder = total % maxPageItem
         local totalPage = 1
-        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
+        local q, _ = math.modf(total / maxPageItem)
         if remainder > 0 then
             totalPage =  q + 1
         else
             totalPage = q
         end
 
-        if currAvailableDevicePage > 1 then
-            if idxAvailableDevices > 1 then
-                SetIdxAvailableDevice(idxAvailableDevices - 1)
+        if currPage > 1 then
+            if idxCurr > 1 then
+                callBackSetIdx(idxCurr - 1)
             else
-                currAvailableDevicePage = currAvailableDevicePage - 1
-                SetIdxAvailableDevice(Config.GRID_PAGE_ITEM)
+                if callBackChangeCurrPage then callBackChangeCurrPage(currPage - 1) end
+                callBackSetIdx(maxPageItem)
             end
         else
-            if idxAvailableDevices > 1 then
-                SetIdxAvailableDevice(idxAvailableDevices - 1)
+            if idxCurr > 1 then
+                callBackSetIdx(idxCurr - 1)
             else
-                currAvailableDevicePage = totalPage
-                SetIdxAvailableDevice(remainder)
+                if callBackChangeCurrPage then callBackChangeCurrPage(totalPage) end
+                callBackSetIdx(remainder)
             end
         end
     else
-        if idxAvailableDevices > 1 then
-            SetIdxAvailableDevice(idxAvailableDevices - 1)
+        if idxCurr > 1 then
+            callBackSetIdx(idxCurr - 1)
         else
-            SetIdxAvailableDevice(total)
+            callBackSetIdx(total)
         end
     end
 end
 
-function AvailableDeviceKeydown()
-    local total = table.getn(availableDevices)
-    local isMultiplePage = total > Config.GRID_PAGE_ITEM
+function GridKeyDown(list, currPage, idxCurr, maxPageItem, callBackSetIdx, callBackChangeCurrPage)
+    local total = table.getn(list)
+    local isMultiplePage = total > maxPageItem
     if isMultiplePage then
-        local remainder = total % Config.GRID_PAGE_ITEM
+        local remainder = total % maxPageItem
         local totalPage = 1
-        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
+        local q, _ = math.modf(total / maxPageItem)
         if remainder > 0 then
             totalPage =  q + 1
         else
             totalPage = q
         end
 
-        if currAvailableDevicePage < totalPage then
-            if idxAvailableDevices < Config.GRID_PAGE_ITEM then
-                SetIdxAvailableDevice(idxAvailableDevices + 1)
+        if currPage < totalPage then
+            if idxCurr < maxPageItem then
+                callBackSetIdx(idxCurr + 1)
             else
-                currAvailableDevicePage = currAvailableDevicePage + 1
-                SetIdxAvailableDevice(1)
+                if callBackChangeCurrPage then callBackChangeCurrPage(currPage + 1)end
+                callBackSetIdx(1)
             end
         else
-            if  idxAvailableDevices < remainder then
-                SetIdxAvailableDevice(idxAvailableDevices + 1)
+            if  idxCurr < remainder then
+                callBackSetIdx(idxCurr + 1)
             else
-                currAvailableDevicePage = 1
-                SetIdxAvailableDevice(1)
-            end
-        end
-    else
-        if idxAvailableDevices < total then
-            SetIdxAvailableDevice(idxAvailableDevices + 1)
-        else
-            SetIdxAvailableDevice(1)
-        end
-    end
-end
-
-function ConnectedDeviceKeyup()
-    local total = table.getn(connectedDevices)
-    local isMultiplePage = total > Config.GRID_PAGE_ITEM
-    if isMultiplePage then
-        local remainder = total % Config.GRID_PAGE_ITEM
-        local totalPage = 1
-        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
-        if remainder > 0 then
-            totalPage =  q + 1
-        else
-            totalPage = q
-        end
-
-        if currConnectedDevicePage > 1 then
-            if idxConnectedDevice > 1 then
-                SetIdxConnectedDevice(idxConnectedDevice - 1)
-            else
-                currConnectedDevicePage = currConnectedDevicePage - 1
-                SetIdxConnectedDevice(Config.GRID_PAGE_ITEM)
-            end
-        else
-            if idxConnectedDevice > 1 then
-                SetIdxConnectedDevice(idxConnectedDevice - 1)
-            else
-                currConnectedDevicePage = totalPage
-                SetIdxConnectedDevice(remainder)
+                if callBackChangeCurrPage then callBackChangeCurrPage(1) end
+                callBackSetIdx(1)
             end
         end
     else
-        if idxConnectedDevice > 1 then
-            SetIdxConnectedDevice(idxConnectedDevice - 1)
+        if idxCurr < total then
+            callBackSetIdx(idxCurr + 1)
         else
-            SetIdxConnectedDevice(total)
-        end
-    end
-end
-
-function ConnectedDeviceKeydown()
-    local total = table.getn(connectedDevices)
-    local isMultiplePage = total > Config.GRID_PAGE_ITEM
-    if isMultiplePage then
-        local remainder = total % Config.GRID_PAGE_ITEM
-        local totalPage = 1
-        local q, _ = math.modf(total / Config.GRID_PAGE_ITEM)
-        if remainder > 0 then
-            totalPage =  q + 1
-        else
-            totalPage = q
-        end
-
-        if currConnectedDevicePage < totalPage then
-            if idxConnectedDevice < Config.GRID_PAGE_ITEM then
-                SetIdxConnectedDevice(idxConnectedDevice + 1)
-            else
-                currConnectedDevicePage = currConnectedDevicePage + 1
-                SetIdxConnectedDevice(1)
-            end
-        else
-            if  idxConnectedDevice < remainder then
-                SetIdxConnectedDevice(idxConnectedDevice + 1)
-            else
-                currConnectedDevicePage = 1
-                SetIdxConnectedDevice(1)
-            end
-        end
-    else
-        if idxConnectedDevice < total then
-            SetIdxConnectedDevice(idxConnectedDevice + 1)
-        else
-            SetIdxConnectedDevice(1)
+            callBackSetIdx(1)
         end
     end
 end
