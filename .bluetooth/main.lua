@@ -57,12 +57,12 @@ function HeaderUI()
     love.graphics.setColor(0.98, 0.98, 0.749)
     love.graphics.setFont(fontBig)
     love.graphics.draw(ic_bluetooth, 640 - 25, yPos + 4)
-    love.graphics.print("Bluetooth Settings", xPos + 230, yPos + 5)
+    love.graphics.print("Bluetooth Settings", xPos + 250, yPos + 2)
 
     Now = os.date('*t')
-    local formatted_time = string.format("%d:%02d", tonumber(Now.hour), tonumber(Now.min))
+    local formatted_time = string.format("%02d:%02d", tonumber(Now.hour), tonumber(Now.min))
     love.graphics.setColor(0.98, 0.98, 0.749, 0.7)
-    love.graphics.print(formatted_time, xPos + 10, yPos + 5)
+    love.graphics.print(formatted_time, xPos + 10, yPos + 2)
 
     love.graphics.setFont(fontSmall)
 end
@@ -112,7 +112,7 @@ function ScanTimeoutSelectionUI()
 
     love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
-    love.graphics.print("Choose timeout", xPos + 80, yPos + 5)
+    love.graphics.print("Choose timeout", xPos + 80, yPos + 2)
 
     local iPos = 1
     local lineHeight = 20
@@ -180,7 +180,7 @@ function AudioSelectionUI()
 
     love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
-    love.graphics.print("Select a sound output ", xPos + 80, yPos + 5)
+    love.graphics.print("Select a sound output ", xPos + 120, yPos + 2)
 
     local iPos = 1
     local lineHeight = 20
@@ -231,7 +231,7 @@ function ConfirmAutoSwitchAudioUI()
 
     love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
-    love.graphics.print("Confirm", xPos + 150, yPos + 5)
+    love.graphics.print("Confirm", xPos + 160, yPos + 2)
 
     love.graphics.setColor(1,1,1)
     love.graphics.print("Do you want to change the audio output?", xPos + 10, yPos + 50)
@@ -273,10 +273,10 @@ function ConnectDevice()
     timeRunConnectFunc = love.timer.getTime()
     runConnectFunc = function ()
         local MAC = ""
-        local fullName = ""
+        local name = ""
         if isAvailableDevicesSelected then
             MAC = availableDevices[idxAvailableDevices].ip
-            fullName = availableDevices[idxAvailableDevices].fullname
+            name = availableDevices[idxAvailableDevices].name
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
 
@@ -297,7 +297,7 @@ function ConnectDevice()
             end
         else
             MAC = connectedDevices[idxConnectedDevice].ip
-            fullName = connectedDevices[idxConnectedDevice].fullname
+            name = connectedDevices[idxConnectedDevice].name
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
         end
@@ -315,7 +315,7 @@ function ConnectDevice()
             msgLog = "Connected: " .. MAC
             audioList = Audio.Sinks()
             for idx,item in ipairs(audioList) do
-                if StringHelper.Trim(item.name) == StringHelper.Trim(fullName) then
+                if StringHelper.Trim(item.name) == StringHelper.Trim(name) then
                     idxAudio = idx
                     isSwitchAudioShow = true
                 end
@@ -377,22 +377,19 @@ function AvailableDevicesUI()
     love.graphics.setColor(1,1,1)
     love.graphics.print("Available", xPos + 120, yPos + 7)
 
-    local iPos = 0
     local lineHeight = 15
     love.graphics.setColor(0.169, 0.259, 0.11)
     love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
 
     love.graphics.setColor(0.169, 0.259, 0.212)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
-    
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
-    
+    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 40, 30)
     love.graphics.setColor(1,1,1)
     love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
 
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 40, 30)
     love.graphics.setColor(1,1,1)
-    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
+    love.graphics.print("Name", xPos + 130, yPos + 30  + 7)
 
     local total = table.getn(availableDevices)
     local idxStart = currAvailableDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
@@ -410,7 +407,7 @@ function AvailableDevicesUI()
 
         love.graphics.setColor(1,1,1)
         love.graphics.print(availableDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(availableDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
+        love.graphics.print(availableDevices[idx].name, xPos + 130, iPos * lineHeight + yPos + 65)
 
         iPos = iPos + 1
     end
@@ -472,16 +469,14 @@ function ConnectedDevicesUI()
     love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
 
     love.graphics.setColor(0.169, 0.259, 0.212)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 20, 30)
-
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 20, 30)
-
+    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 40, 30)
     love.graphics.setColor(1,1,1)
     love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
 
+    love.graphics.setColor(0.169, 0.259, 0.11)
+    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 40, 30)
     love.graphics.setColor(1,1,1)
-    love.graphics.print("Name", xPos + 150, yPos + 30  + 7)
+    love.graphics.print("Name", xPos + 130, yPos + 30  + 7)
 
     local total = table.getn(connectedDevices)
     local idxStart = currConnectedDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
@@ -499,7 +494,7 @@ function ConnectedDevicesUI()
 
         love.graphics.setColor(1,1,1)
         love.graphics.print(connectedDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(connectedDevices[idx].name, xPos + 150, iPos * lineHeight + yPos + 65)
+        love.graphics.print(connectedDevices[idx].name, xPos + 130, iPos * lineHeight + yPos + 65)
 
         iPos = iPos + 1
     end
@@ -550,7 +545,7 @@ function ShowQuitConfirmUI()
 
     love.graphics.setFont(fontBig)
     love.graphics.setColor(0,0,0, 0.5)
-    love.graphics.print("Confirm", xPos + 150, yPos + 5)
+    love.graphics.print("Confirm", xPos + 160, yPos + 2)
 
     love.graphics.setColor(1,1,1)
     love.graphics.print("Are you sure you want to exit?", xPos + 10, yPos + 50)
