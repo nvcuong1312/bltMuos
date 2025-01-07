@@ -4,21 +4,21 @@ Bluetooth Setting for MUOS
 
 
 
-**Note: If you are using 2 memory cards.**
-- Go to Configuration->Storage->User Init Scripts and select SD1
+1. Expect
+Copy into "ARCHIVE" folder and install via Archive (only required for **first time** installation)  
+[expect.zip](https://github.com/user-attachments/files/18332146/expect.zip)
 
-1. [expect.zip](https://github.com/user-attachments/files/18309191/expect.zip)
+3. Bluetooth 
+- [Method 1] Copy into "ARCHIVE" folder and install via Archive  
+[Bluetooth20250107.zip](https://github.com/user-attachments/files/18332175/Bluetooth20250107.zip)
 
-- Copy into "ARCHIVE" folder and install via Archive
-=>**expect** only required for **first time** installation
-
-2. [BluetoothLoader.zip](https://github.com/user-attachments/files/18285876/BluetoothLoader.zip)
-- Extract and copy BluetoothLoader.sh into "MUOS/Task" folder
-- Run BluetoothLoader from Application/Task ToolKit
-- Once completed, the Bluetooth App will be available in Application
-
-The application is always updated to the latest on the main branch.
-You just need to run BluetoothLoader from Task ToolKit again to update
+- [Method 2]  Require WIFI connection  
+[BluetoothLoader.zip](https://github.com/user-attachments/files/18332234/BluetoothLoader.zip)
+Extract and copy BluetoothLoader.sh into "MUOS/Task" folder  
+Run BluetoothLoader from Application/Task ToolKit  
+Once completed, the Bluetooth App will be available in Application  
+The application is always updated to the latest on the main branch.  
+You just need to run BluetoothLoader from Task ToolKit again to update  
 
 3. **Manage audio output with full functionality.**
 
