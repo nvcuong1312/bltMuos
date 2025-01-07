@@ -682,6 +682,20 @@ function love.gamepadpressed(joystick, button)
  end
 
  function OnKeyPress(key)
+    if isQuitConfirm then
+        if key == "a" then
+            love.event.quit()
+           return 
+        end
+
+        if key == "b" then
+            isQuitConfirm = false
+            return
+        end
+
+        return
+    end
+
     if isSwitchAudioShow then
         if key == "a" then
             SelectAudio()
@@ -693,6 +707,8 @@ function love.gamepadpressed(joystick, button)
             isSwitchAudioShow = false
             return
         end
+
+        return
     end
 
     if isTimeoutShow then
@@ -716,6 +732,8 @@ function love.gamepadpressed(joystick, button)
             GridKeyDown(Config.TIMEOUT_LIST, 1, idxTimeout, 6, function (idx) idxTimeout = idx end)
             return
         end
+
+        return
     end
 
     if isAudioShow then
@@ -739,9 +757,16 @@ function love.gamepadpressed(joystick, button)
             GridKeyDown(audioList, 1, idxAudio, 10, function (idx) idxAudio = idx end)
             return
         end
+
+        return
     end
 
     if isAvailableDevicesSelected then
+        if key == "a" then
+            ConnectDevice()
+            return
+        end
+
         if key == "up" then
             GridKeyUp(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
             return
@@ -754,6 +779,16 @@ function love.gamepadpressed(joystick, button)
     end
 
     if not isAvailableDevicesSelected then
+        if key == "a" then
+            ConnectDevice()
+            return
+        end
+
+        if key == "x" then
+            DisconnectDevice()
+            return
+        end
+
         if key == "up" then
             GridKeyUp(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
             return
@@ -765,40 +800,17 @@ function love.gamepadpressed(joystick, button)
         end
     end
 
-    if isQuitConfirm then
-        if key == "a" then
-            love.event.quit()
-           return 
-        end
-
-        if key == "b" then
-            isQuitConfirm = false
-            return
-        end
-    end
-
     if isBluetoothOn then
-        if key == "a" then
-            -- Connect
-            ConnectDevice()
-            return
-        elseif key == "x" then
-            -- Disconnect
-            DisconnectDevice()
-            return
-        elseif key == "select" then
-            -- PowerOff
+       if key == "select" then
             TurnOffBluetooth()
             return
         else if key == "y" then
-            -- Scan
             ShowScanTimeoutUI()
             return
         end
     end
     else
         if key == "start" then
-            -- PowerOn
             TurnOnBluetooth()
             return
         end
