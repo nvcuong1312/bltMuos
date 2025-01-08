@@ -1,4 +1,5 @@
 #!/bin/sh
+# ICON: bluetooth
 
 if [ -d "BluetoothData" ]; then
   rm -r "BluetoothData"
@@ -15,13 +16,19 @@ if [ -e "mnt/mmc/MUOS/application/Bluetooth.sh" ]; then
     rm -r "mnt/mmc/MUOS/application/Bluetooth.sh"
 fi
 
-if [ -e "mnt/mmc/MUOS/theme/active/glyph/muxapp/bluetooth.png" ]; then
-    rm -r "mnt/mmc/MUOS/theme/active/glyph/muxapp/bluetooth.png"
+if [ -e "opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png" ]; then
+    rm -r "opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png"
+fi
+
+if [ -e "opt/muos/default/MUOS/theme/active/glyph/muxtask/bluetooth.png" ]; then
+    rm -r "opt/muos/default/MUOS/theme/active/glyph/muxtask/bluetooth.png"
 fi
 
 mv "BluetoothData/UnzipData/bltMuos-main/.bluetooth" "mnt/mmc/MUOS/application/"
 mv "BluetoothData/UnzipData/bltMuos-main/Bluetooth.sh" "mnt/mmc/MUOS/application/Bluetooth.sh"
-mv "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "mnt/mmc/MUOS/theme/active/glyph/muxapp/bluetooth.png"
+
+cp "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png"
+cp "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "opt/muos/default/MUOS/theme/active/glyph/muxtask/bluetooth.png"
 
 echo "-----------------------------------"
 echo "|Author     : CuongNV             |"
