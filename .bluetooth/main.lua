@@ -835,6 +835,7 @@ end
 
 function GridKeyUp(list,currPage, idxCurr, maxPageItem, callBackSetIdx, callBackChangeCurrPage)
     local total = table.getn(list)
+    if total < 1 then return end
     local isMultiplePage = total > maxPageItem
     if isMultiplePage then
         local remainder = total % maxPageItem
@@ -872,6 +873,7 @@ end
 
 function GridKeyDown(list, currPage, idxCurr, maxPageItem, callBackSetIdx, callBackChangeCurrPage)
     local total = table.getn(list)
+    if total < 1 then return end
     local isMultiplePage = total > maxPageItem
     if isMultiplePage then
         local remainder = total % maxPageItem
