@@ -265,7 +265,7 @@ function ConnectDevice()
     if (    isAvailableDevicesSelected and table.getn(availableDevices) < 1)
         or (not isAvailableDevicesSelected
             and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED
-            and table.getn(connectedDevices) > 0) then
+            and table.getn(connectedDevices) < 0) then
         return
     end
 
