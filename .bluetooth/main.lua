@@ -265,7 +265,7 @@ function ConnectDevice()
     if (    isAvailableDevicesSelected and table.getn(availableDevices) < 1)
         or (not isAvailableDevicesSelected
             and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED
-            and table.getn(connectedDevices) < 0) then
+            and table.getn(connectedDevices) < 1) then
         return
     end
 
@@ -756,47 +756,47 @@ function love.gamepadpressed(joystick, button)
         return
     end
 
-    if isAvailableDevicesSelected then
-        if key == "a" then
-            ConnectDevice()
-            return
-        end
-
-        if key == "up" then
-            GridKeyUp(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
-            return
-        end
-
-        if key == "down" then
-            GridKeyDown(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
-            return
-        end
-    end
-
-    if not isAvailableDevicesSelected then
-        if key == "a" then
-            ConnectDevice()
-            return
-        end
-
-        if key == "x" then
-            DisconnectDevice()
-            return
-        end
-
-        if key == "up" then
-            GridKeyUp(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
-            return
-        end
-
-        if key == "down" then
-            GridKeyDown(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
-            return
-        end
-    end
-
     if isBluetoothOn then
-       if key == "select" then
+        if isAvailableDevicesSelected then
+            if key == "a" then
+                ConnectDevice()
+                return
+            end
+    
+            if key == "up" then
+                GridKeyUp(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
+                return
+            end
+    
+            if key == "down" then
+                GridKeyDown(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
+                return
+            end
+        end
+    
+        if not isAvailableDevicesSelected then
+            if key == "a" then
+                ConnectDevice()
+                return
+            end
+    
+            if key == "x" then
+                DisconnectDevice()
+                return
+            end
+    
+            if key == "up" then
+                GridKeyUp(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
+                return
+            end
+    
+            if key == "down" then
+                GridKeyDown(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
+                return
+            end
+        end
+
+        if key == "select" then
             TurnOffBluetooth()
             return
         else if key == "y" then
