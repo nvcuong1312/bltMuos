@@ -75,6 +75,7 @@ function BottomButtonUI()
     love.graphics.setColor(1,1,1)
     love.graphics.print("[Y]: Scan", xPos + 100, yPos)
     love.graphics.print("[A]: Connect", xPos, yPos)
+    if txtDisconnectRemoveBtn == "" then txtDisconnectRemoveBtn = "Disconnect" end
     love.graphics.print("[X]: " .. txtDisconnectRemoveBtn, xPos, yPos + 20)
     love.graphics.print("[B]: Quit",  xPos + 100, yPos + 20)
     love.graphics.print("[Start]  : ON",  xPos + 180, yPos)
