@@ -568,6 +568,10 @@ function love.load()
         if table.getn(connectedDevices) > 0 then
             isAvailableDevicesSelected = false
             itemSelectedType = connectedDevices[1].type
+
+            if itemSelectedType == Bluetooth.ConnectedType.CONNECTED then txtDisconnectRemoveBtn = "Disconnect"
+            else txtDisconnectRemoveBtn = "Remove"
+            end
         end
     end
 
