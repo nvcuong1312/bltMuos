@@ -276,8 +276,9 @@ function ConnectDevice()
         local MAC = ""
         local name = ""
         if isAvailableDevicesSelected then
-            MAC = availableDevices[idxAvailableDevices].ip
-            name = availableDevices[idxAvailableDevices].name
+            local pos = (currAvailableDevicePage - 1) * Config.GRID_PAGE_ITEM + idxAvailableDevices
+            MAC = availableDevices[pos].ip
+            name = availableDevices[pos].name
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
 
@@ -297,8 +298,9 @@ function ConnectDevice()
                 end
             end
         else
-            MAC = connectedDevices[idxConnectedDevice].ip
-            name = connectedDevices[idxConnectedDevice].name
+            local pos = (currConnectedDevicePage - 1) * Config.GRID_PAGE_ITEM + idxConnectedDevice
+            MAC = connectedDevices[pos].ip
+            name = connectedDevices[pos].name
             Bluetooth.Connect(MAC)
             connectedDevices = Bluetooth.GetConnectedDevices()
         end
@@ -339,8 +341,9 @@ function DisconnectDevice()
     msgLog = "Disconnecting..."
     timeRunDisConnectFunc = love.timer.getTime()
     runDisConnectFunc = function ()
-        local MAC = connectedDevices[idxConnectedDevice].ip
-        local dType = connectedDevices[idxConnectedDevice].type
+        local pos = (currConnectedDevicePage - 1) * Config.GRID_PAGE_ITEM + idxConnectedDevice
+        local MAC = connectedDevices[pos].ip
+        local dType = connectedDevices[pos].type
 
         if dType == Bluetooth.ConnectedType.CONNECTED then
             Bluetooth.Disconnect(MAC)
@@ -767,34 +770,34 @@ function love.gamepadpressed(joystick, button)
                 ConnectDevice()
                 return
             end
-    
+
             if key == "up" then
                 GridKeyUp(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
                 return
             end
-    
+
             if key == "down" then
                 GridKeyDown(availableDevices, currAvailableDevicePage, idxAvailableDevices, Config.GRID_PAGE_ITEM, SetIdxAvailableDevice, ChangeAvailableDevicePage)
                 return
             end
         end
-    
+
         if not isAvailableDevicesSelected then
             if key == "a" then
                 ConnectDevice()
                 return
             end
-    
+
             if key == "x" then
                 DisconnectDevice()
                 return
             end
-    
+
             if key == "up" then
                 GridKeyUp(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
                 return
             end
-    
+
             if key == "down" then
                 GridKeyDown(connectedDevices, currConnectedDevicePage, idxConnectedDevice, Config.GRID_PAGE_ITEM, SetIdxConnectedDevice, ChangeConnectedDevicePage)
                 return
@@ -840,7 +843,7 @@ end
 
 function GridKeyUp(list,currPage, idxCurr, maxPageItem, callBackSetIdx, callBackChangeCurrPage)
     local total = table.getn(list)
-    if total < 1 then return end
+    if total < 1 or total == 1 then return end
     local isMultiplePage = total > maxPageItem
     if isMultiplePage then
         local remainder = total % maxPageItem
@@ -850,6 +853,7 @@ function GridKeyUp(list,currPage, idxCurr, maxPageItem, callBackSetIdx, callBack
             totalPage =  q + 1
         else
             totalPage = q
+            remainder = maxPageItem
         end
 
         if currPage > 1 then
@@ -878,7 +882,7 @@ end
 
 function GridKeyDown(list, currPage, idxCurr, maxPageItem, callBackSetIdx, callBackChangeCurrPage)
     local total = table.getn(list)
-    if total < 1 then return end
+    if total < 1 or total == 1 then return end
     local isMultiplePage = total > maxPageItem
     if isMultiplePage then
         local remainder = total % maxPageItem
@@ -888,6 +892,7 @@ function GridKeyDown(list, currPage, idxCurr, maxPageItem, callBackSetIdx, callB
             totalPage =  q + 1
         else
             totalPage = q
+            remainder = maxPageItem
         end
 
         if currPage < totalPage then
