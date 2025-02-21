@@ -139,7 +139,9 @@ function Bluetooth.GetConnectedDevices()
             end
         end
     end
-
+    
+    Bluetooth.GetBatteryPercent()
+    
     return connectedDevices
 end
 
@@ -162,6 +164,25 @@ end
 
 function Bluetooth.Pair(deviceMAC)
     os.execute("bluetoothctl pair " .. deviceMAC)
+end
+
+function Bluetooth.GetBatteryPercent()
+    for _,device in ipairs(connectedDevices) do
+        if device.type == Bluetooth.ConnectedType.CONNECTED then
+            os.execute("bluetoothctl info " .. device.ip .. " > " .. Config.BLUETOOTH_BATTERY_PATH)
+            local file = io.open(Config.BLUETOOTH_BATTERY_PATH, "r")
+            if file then
+                for line in file:lines() do
+                    if string.find(line, "Battery") then
+                        local battery = line:match("Battery Percentage: 0x%x+ %((%d+)%)")
+                        if battery then
+                            device.battery = battery .. "%"
+                        end
+                    end
+                end
+            end
+        end
+    end
 end
 
 return Bluetooth
