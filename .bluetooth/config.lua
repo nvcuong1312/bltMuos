@@ -8,6 +8,7 @@ Config.BLUETOOTH_SHOW_PATH = "data/blushow.txt"
 Config.BLUETOOTH_TRUST_PATH = "data/trust.txt"
 Config.BLUETOOTH_PAIR_PATH = "data/pair.txt"
 Config.BLUETOOTH_CONNECT_PATH = "data/connect.txt"
+Config.BLUETOOTH_BATTERY_PATH = "data/battery.txt"
 
 Config.AUDIO_SINK_NUMBER = "data/sinknumber.txt"
 Config.AUDIO_SINKS = "data/sinks.txt"

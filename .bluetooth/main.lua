@@ -498,7 +498,13 @@ function ConnectedDevicesUI()
 
         love.graphics.setColor(1,1,1)
         love.graphics.print(connectedDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(connectedDevices[idx].name, xPos + 130, iPos * lineHeight + yPos + 65)
+
+        local deviceName = connectedDevices[idx].name
+        if connectedDevices[idx].battery then
+            deviceName = "[" .. connectedDevices[idx].battery .. "] " .. deviceName
+        end
+
+        love.graphics.print(deviceName, xPos + 130, iPos * lineHeight + yPos + 65)
 
         iPos = iPos + 1
     end
