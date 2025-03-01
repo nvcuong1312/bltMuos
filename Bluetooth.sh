@@ -53,6 +53,11 @@ if ! pgrep -f "/usr/libexec/bluetooth/bluetoothd -n -d" > /dev/null; then
     /usr/libexec/bluetooth/bluetoothd -n -d > /mnt/mmc/MUOS/log/bluetoothd.log 2>&1 &
 fi
 
+if hciconfig hci0 | grep -q "DOWN"; then
+	hciconfig hci0 up
+	sleep 1
+fi
+
 # Launcher
 cd "$LOVEDIR" || exit
 SET_VAR "system" "foreground_process" "love"
