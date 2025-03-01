@@ -9,11 +9,8 @@ Copy into "ARCHIVE" folder and install via Archive (only required for **first ti
 [expect.zip](https://github.com/user-attachments/files/18332146/expect.zip)
 
 3. Bluetooth 
-- [Method 1] Copy into "ARCHIVE" folder and install via Archive  
-[Bluetooth20250107.zip](https://github.com/user-attachments/files/18332175/Bluetooth20250107.zip)
+[BluetoothLoader_20250116.zip](https://github.com/user-attachments/files/18442325/BluetoothLoader_20250116.zip)
 
-- [Method 2]  Require WIFI connection  
-[BluetoothLoader.zip](https://github.com/user-attachments/files/18332234/BluetoothLoader.zip)
 Extract and copy BluetoothLoader.sh into "MUOS/Task" folder  
 Run BluetoothLoader from Application/Task ToolKit  
 Once completed, the Bluetooth App will be available in Application  
