@@ -44,7 +44,7 @@ fi
 
 if ! pgrep -f "/usr/libexec/bluetooth/bluetoothd -n -d" > /dev/null; then    
     for i in {1..5}; do
-        if hciconfig | grep -q "hci0"; then
+        if hciconfig hci0 | grep -q "UP"; then
             break
         fi
         sleep 1
