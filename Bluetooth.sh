@@ -39,21 +39,23 @@ fi
 
 if ! pgrep -f "rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5" > /dev/null; then
     rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5 > /mnt/mmc/MUOS/log/rtk_hciattach.log 2>&1 &
-	sleep 2
+	sleep 3
 fi
 
-if ! pgrep -f "/usr/libexec/bluetooth/bluetoothd -n -d" > /dev/null; then    
-    for i in {1..5}; do
-        if hciconfig hci0 | grep -q "UP"; then
-            break
-        fi
-        sleep 1
-    done
+for i in {1..5}; do
+	if hciconfig hci0 | grep -q "UP"; then
+		break
+	fi
+	sleep 1
+done
 
+if ! pgrep -f "/usr/libexec/bluetooth/bluetoothd -n -d" > /dev/null; then
     /usr/libexec/bluetooth/bluetoothd -n -d > /mnt/mmc/MUOS/log/bluetoothd.log 2>&1 &
 fi
 
 if hciconfig hci0 | grep -q "DOWN"; then
+	rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5
+	sleep 10
 	hciconfig hci0 up
 	sleep 1
 fi
