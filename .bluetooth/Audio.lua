@@ -45,9 +45,11 @@ end
 function Audio.Select(id)
     local cmd = "wpctl set-default \"" .. id .. "\""
     local cmd2 = "echo \"" .. id .."\" > \"/run/muos/audio/nid_internal\""
+    local cmd3 = "wpctl set-mute " .. id .. " 0"
     if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") ~= "1" then
         os.execute(cmd)
         os.execute(cmd2)
+        os.execute(cmd3)
         socket.sleep(0.5)
     end
 
