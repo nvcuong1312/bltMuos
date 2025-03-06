@@ -1,37 +1,29 @@
-Bluetooth Setting for MUOS
+## Bluetooth for muOS
+
+A simple tool to manage Bluetooth connections on gaming devices running **muOS**, allowing you to easily connect and control Bluetooth devices.  
 
 ![muOS_20250105_1228_0](https://github.com/user-attachments/assets/e9cf6c27-c8b1-4747-8ec9-61bd60b08587)
 
+### 🚀 Features  
+- Scan and connect to Bluetooth devices  
+- Stable and fast pairing process  
+- Supports multiple device types (controllers, headphones, keyboards, etc.)  
 
+### 📥 Installation  
+1. Download the latest release from [GitHub Releases](https://github.com/nvcuong1312/bltMuos/releases).  
+2. Follow the installation instructions in the documentation.  
 
-1. Expect
-Copy into "ARCHIVE" folder and install via Archive (only required for **first time** installation)  
-[expect.zip](https://github.com/user-attachments/files/18332146/expect.zip)
+### 🔗 Related Projects
+Below are my other projects for muOS:
+- [Bluetooth muOS](https://github.com/nvcuong1312/bltMuos)
+- [CTupe muOS](https://github.com/nvcuong1312/YtMuos)
+- [HotSpot muOS](https://github.com/nvcuong1312/hotspotmuos)
 
-3. Bluetooth 
-[BluetoothLoader_20250116.zip](https://github.com/user-attachments/files/18442325/BluetoothLoader_20250116.zip)
-
-Extract and copy BluetoothLoader.sh into "MUOS/Task" folder  
-Run BluetoothLoader from Application/Task ToolKit  
-Once completed, the Bluetooth App will be available in Application  
-The application is always updated to the latest on the main branch.  
-You just need to run BluetoothLoader from Task ToolKit again to update  
-
-3. **Manage audio output with full functionality.**
-
-Increase or decrease the volme is now **available**
-- When connecting to an audio device, a confirmation screen will appear
-- Press L1 to manual select the audio output you want.
-----------
-*Tips: When disconnecting the audio, you need to press L1 to re-select the audio output. Then you can increase or decrease the volume.*
-
-![image](https://github.com/user-attachments/assets/5f118191-e43a-40d1-9915-7c025bb29f94)
-
-![image](https://github.com/user-attachments/assets/bc304f5f-6490-4ec3-9c3d-92c6e49df8ff)
-
-
-Support me!
-
+### 💖 Donate  
+If you find this project helpful and want to support my work, you can donate via:  
 - [Paypal](https://paypal.me/cnv95)
-
 - [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B716P661)
+
+Your support is greatly appreciated! 🚀  
+
+Let me know if you need any modifications! 😊
