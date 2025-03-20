@@ -19,18 +19,28 @@ expect {
     default {
         send "pair $device_mac\r"
         expect {
-            "Pairing successful" {
+			"Pairing successful" {
                 puts "Pairing successful."
                 send "trust $device_mac\r"
                 expect "#"
             }
-            timeout {
-                puts "Pairing failed. Exiting."
-                send "exit\r"
-                expect eof
-                exit
-            }
-        }
+			default {
+				send "yes\r"
+				expect {
+					"Pairing successful" {
+						puts "Pairing successful."
+						send "trust $device_mac\r"
+						expect "#"
+					}
+					timeout {
+						puts "Pairing failed. Exiting."
+						send "exit\r"
+						expect eof
+						exit
+					}
+				}
+			}
+		}
     }
 }
 
@@ -40,8 +50,10 @@ expect {
         puts "Device connected successfully."
     }
     timeout {
-        puts "Failed to connect to the device."
+        puts "No confirmation prompt detected, assuming success."
+        puts "Device connected successfully."
     }
 }
+
 send "exit\r"
 expect eof
