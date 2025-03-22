@@ -29,8 +29,8 @@ if unzip -o "BluetoothData/dev.zip" -d "BluetoothData/UnzipData/"; then
 	mv "BluetoothData/UnzipData/bltMuos-dev/.bluetooth" "mnt/mmc/MUOS/application/"
 	mv "BluetoothData/UnzipData/bltMuos-dev/Bluetooth.sh" "mnt/mmc/MUOS/application/Bluetooth.sh"
 
-	cp "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png"
-	cp "mnt/mmc/MUOS/application/.bluetooth/bin/bluetooth.png" "opt/muos/default/MUOS/theme/active/glyph/muxtask/bluetooth.png"
+	cp "mnt/mmc/MUOS/application/.bluetooth/Assets/ic_bluetooth.png" "opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png"
+	cp "mnt/mmc/MUOS/application/.bluetooth/Assets/ic_bluetooth.png" "opt/muos/default/MUOS/theme/active/glyph/muxtask/bluetooth.png"
 	
 	if [ -e "mnt/mmc/MUOS/task/BluetoothLoader_dev.sh" ]; then
 		rm -r "mnt/mmc/MUOS/task/BluetoothLoader_dev.sh"
