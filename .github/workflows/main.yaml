@@ -33,7 +33,7 @@ jobs:
           run: |
             cd .bluetooth
             zip -r Bluetooth-Install-Update-PIXIE.zip . ../package/mux_launch.sh
-            mv Bluetooth-Install-Update-PIXIE.zip packages/Bluetooth-Install-Update-PIXIE.muxupd
+            mv Bluetooth-Install-Update-PIXIE.zip ../packages/Bluetooth-Install-Update-PIXIE.muxupd
         - name: Upload artifact
           uses: actions/upload-artifact@v4
           with:
