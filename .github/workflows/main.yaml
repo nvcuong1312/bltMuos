@@ -25,7 +25,7 @@ jobs:
             cp -r .bluetooth/* build/mnt/mmc/MUOS/application/Bluetooth
             cp .bluetooth/bin/bluetooth.sh build/run/muos/storage/init
             cp package/mux_launch.sh build/mnt/mmc/MUOS/application/Bluetooth
-            cp package/update.sh /opt
+            cp package/update.sh build/opt
             cp  .bluetooth/Assets/Icon/ic_bluetooth.png build/opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png
         - name: Package muxupd
           run: |
