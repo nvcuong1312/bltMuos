@@ -56,8 +56,8 @@ function HeaderUI()
 
     love.graphics.setColor(0.98, 0.98, 0.749)
     love.graphics.setFont(fontBig)
-    love.graphics.draw(ic_bluetooth, 640 - 25, yPos + 4)
-    love.graphics.print("Bluetooth Settings", xPos + 250, yPos + 2)
+    love.graphics.draw(ic_bluetooth, 640 - 30, yPos + 2)
+    love.graphics.print("Bluetooth", xPos + 280, yPos + 2)
 
     Now = os.date('*t')
     local formatted_time = string.format("%02d:%02d", tonumber(Now.hour), tonumber(Now.min))
@@ -313,7 +313,7 @@ function ConnectDevice()
         end
 
         if not isExists then
-            msgLog = "Failed to connect: " .. MAC
+            msgLog = "Failed! Send to me: /data/connect.txt"
         else
             msgLog = "Connected: " .. MAC
             audioList = Audio.Sinks()

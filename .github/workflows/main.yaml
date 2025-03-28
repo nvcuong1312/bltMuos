@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  package:
+    name: Package for MUOS
+    runs-on: ubuntu-latest
+    steps:
+        - name: Check out repo
+          uses: actions/checkout@v2
+        - name:  Create muxupd directory
+          run: mkdir -p build
+        - name: Create muxupd structure
+          run: |
+            mkdir -p build/mnt/mmc/MUOS/application/Bluetooth
+            mkdir -p build/opt/muos/default/MUOS/theme/active/glyph/muxapp
+            mkdir -p build/run/muos/storage/init
+        - name: Move files to muxupd tree
+          run: |
+            cp -r .bluetooth/* build/mnt/mmc/MUOS/application/Bluetooth
+            cp .bluetooth/bin/bluetooth.sh build/run/muos/storage/init
+            cp package/mux_launch.sh build/mnt/mmc/MUOS/application/Bluetooth
+            cp package/update.sh build/opt
+            cp  .bluetooth/Assets/Icon/ic_bluetooth.png build/opt/muos/default/MUOS/theme/active/glyph/muxapp/bluetooth.png
+        - name: Package muxupd
+          run: |
+            cd build
+            zip -r Bluetooth-Install-Full-PIXIE.zip .
+            mv Bluetooth-Install-Full-PIXIE.zip Bluetooth-Install-Full-PIXIE.muxupd
+        - name: Upload artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: MUOS Bluetooth Pixie Installer
+            path: |
+              build/Bluetooth-Install-Full-PIXIE.muxupd
