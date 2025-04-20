@@ -2,7 +2,8 @@
 
 A simple tool to manage Bluetooth connections on gaming devices running **muOS**, allowing you to easily connect and control Bluetooth devices.  
 
-![muOS_20250105_1228_0](https://github.com/user-attachments/assets/e9cf6c27-c8b1-4747-8ec9-61bd60b08587)
+![d69c60f2f6a3e3def48e0ef219633ef829a552a7](https://github.com/user-attachments/assets/311055c4-1150-4749-ad60-f86ffa173dea)
+
 
 ### 🚀 Features  
 - Scan and connect to Bluetooth devices  
