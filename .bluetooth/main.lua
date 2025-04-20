@@ -32,6 +32,10 @@ local runDisConnectFunc
 local timeRunDisConnectFunc = 0
 
 local ic_bluetooth
+local ic_bluetooth_big
+local ic_plus, ic_minus
+local ic_A, ic_B, ic_X, ic_Y, ic_ZL
+local ic_off, ic_on
 
 local isTimeoutShow = false
 local idxTimeout = 1
@@ -46,43 +50,55 @@ local isQuitConfirm = false
 
 local fontBig
 local fontSmall
+local fontBold
+local fontBoldSmall
+local fontBoldSmallest
 
 function HeaderUI()
     local xPos = 0
     local yPos = 0
 
-    love.graphics.setColor(0.31, 0.31, 0.118)
-    love.graphics.rectangle("fill", xPos, yPos, 640, 30)
+    love.graphics.setColor(0.141, 0.141, 0.141)
+    love.graphics.rectangle("fill", xPos, yPos, 640, 48)
 
-    love.graphics.setColor(0.98, 0.98, 0.749)
-    love.graphics.setFont(fontBig)
-    love.graphics.draw(ic_bluetooth, 640 - 30, yPos + 2)
-    love.graphics.print("Bluetooth", xPos + 280, yPos + 2)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(fontBold)
+    love.graphics.draw(ic_bluetooth, 8, yPos + 8)
+    love.graphics.print("Bluetooth", xPos + 37, yPos + 8)
 
     Now = os.date('*t')
     local formatted_time = string.format("%02d:%02d", tonumber(Now.hour), tonumber(Now.min))
-    love.graphics.setColor(0.98, 0.98, 0.749, 0.7)
-    love.graphics.print(formatted_time, xPos + 10, yPos + 2)
+    love.graphics.print(formatted_time, 640 - 60, yPos + 8)
 
     love.graphics.setFont(fontSmall)
 end
 
 function BottomButtonUI()
-    local xPos = 10
-    local yPos = 435
+    local xPos = 8
+    local yPos = 480 - 90 
 
-    -- UI
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("[Y]: Scan", xPos + 100, yPos)
-    love.graphics.print("[A]: Connect", xPos, yPos)
-    if txtDisconnectRemoveBtn == "" then txtDisconnectRemoveBtn = "Disconnect" end
-    love.graphics.print("[X]: " .. txtDisconnectRemoveBtn, xPos, yPos + 20)
-    love.graphics.print("[B]: Quit",  xPos + 100, yPos + 20)
-    love.graphics.print("[Start]  : ON",  xPos + 180, yPos)
-    love.graphics.print("[Select]: OFF", xPos + 180, yPos + 20)
-    love.graphics.print("[L1]: Audio",  xPos + 265, yPos + 20)
+    love.graphics.setColor(0.078, 0.106, 0.173)
+    love.graphics.rectangle("fill", xPos, yPos, 623, 40, 4,4)
 
-    -- Event
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print(msgLog, xPos + 5, yPos + 8)
+
+    xPos = 0
+    yPos = 480 - 45
+    love.graphics.setColor(0.141, 0.141, 0.141)
+    love.graphics.rectangle("fill", xPos, yPos, 680, 45)
+    
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.draw(ic_minus, xPos + 5, yPos + 10)
+    love.graphics.print("Off", xPos + 5 + 30, yPos + 13)
+    if isBluetoothOn then
+        love.graphics.draw(ic_on, xPos + 5 + 30 + 40, yPos + 7)
+    else
+        love.graphics.draw(ic_off, xPos + 5 + 30 + 40, yPos + 7)
+    end
+
+    love.graphics.draw(ic_plus, xPos + 5 + 30 + 40 + 80, yPos + 10)
+    love.graphics.print("On",  xPos + 5 + 30 + 40 + 80 + 30, yPos + 13)
 end
 
 -- Scan
@@ -102,37 +118,42 @@ function ScanTimeoutSelectionUI()
     local xPos = 180
     local yPos = 100
 
-    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.setColor(0,0,0, 0.7)
     love.graphics.rectangle("fill", 0,0, 640, 480)
 
-    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.setColor(0.094, 0.094, 0.094)
     love.graphics.rectangle("fill", xPos,yPos, 300, 200)
 
-    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.setColor(0.141, 0.141, 0.141)
     love.graphics.rectangle("fill", xPos,yPos, 300, 30)
 
     love.graphics.setFont(fontBig)
-    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.setColor(1,1,1)
     love.graphics.print("Choose timeout", xPos + 80, yPos + 2)
 
     local iPos = 1
-    local lineHeight = 20
+    local lineHeight = 30
     for _,timeout in ipairs(Config.TIMEOUT_LIST) do
         love.graphics.setColor(1,1,1)
         if iPos == idxTimeout then
             love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 30, 300, lineHeight)
+            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 10, 300, lineHeight)
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print(timeout, xPos + 10, iPos * lineHeight + yPos + 30)
+        love.graphics.print(timeout .. " seconds", xPos + 10, iPos * lineHeight + yPos + 10 + 3)
         iPos = iPos + 1
     end
 
-    love.graphics.setFont(fontSmall)
-
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos,yPos + 200, 300, 40)
     love.graphics.setColor(1,1,1)
-    love.graphics.print("A: Continue   B: Close", xPos, yPos + 200)
+    love.graphics.draw(ic_A, xPos + 5, yPos + 207)
+    love.graphics.print("Continue", xPos + 5 + 30, yPos + 210)
+
+    love.graphics.draw(ic_B, xPos + 5 + 30 + 80, yPos + 207)
+    love.graphics.print("Close", xPos + 5 + 30 + 80 + 30, yPos + 210)
 end
 
 function Scan()
@@ -170,37 +191,42 @@ function AudioSelectionUI()
     local xPos = 140
     local yPos = 80
 
-    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.setColor(0,0,0, 0.7)
     love.graphics.rectangle("fill", 0,0, 640, 480)
 
-    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.setColor(0.094, 0.094, 0.094)
     love.graphics.rectangle("fill", xPos,yPos, 400, 300)
 
-    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.setColor(0.141, 0.141, 0.141)
     love.graphics.rectangle("fill", xPos,yPos, 400, 30)
 
     love.graphics.setFont(fontBig)
-    love.graphics.setColor(0,0,0, 0.5)
-    love.graphics.print("Select a sound output ", xPos + 120, yPos + 2)
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Select a sound output", xPos + 120, yPos + 2)
 
     local iPos = 1
-    local lineHeight = 20
+    local lineHeight = 30
     for _,audio in ipairs(audioList) do
         love.graphics.setColor(1,1,1)
         if iPos == idxAudio then
             love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 20, 400, lineHeight)
+            love.graphics.rectangle("fill", xPos,iPos * lineHeight + yPos + 10, 400, lineHeight)
             love.graphics.setColor(1,1,1)
         end
 
-        love.graphics.print("[" .. audio.id .. "] " .. audio.name, xPos + 10, iPos * lineHeight + yPos + 20)
+        love.graphics.print("[" .. audio.id .. "] " .. audio.name, xPos + 10, iPos * lineHeight + yPos + 10)
         iPos = iPos + 1
     end
 
-    love.graphics.setFont(fontSmall)
-
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos,yPos + 300, 400, 40)
     love.graphics.setColor(1,1,1)
-    love.graphics.print("A: Select   B: Close", xPos, yPos + 300)
+    love.graphics.draw(ic_A, xPos + 5, yPos + 307)
+    love.graphics.print("Select", xPos + 5 + 30, yPos + 310)
+
+    love.graphics.draw(ic_B, xPos + 5 + 30 + 80, yPos + 307)
+    love.graphics.print("Close", xPos + 5 + 30 + 80 + 30, yPos + 310)
 end
 
 function SelectAudio()
@@ -221,24 +247,31 @@ function ConfirmAutoSwitchAudioUI()
     local xPos = 140
     local yPos = 100
 
-    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.setColor(0,0,0, 0.7)
     love.graphics.rectangle("fill", 0,0, 640, 480)
 
-    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.setColor(0.094, 0.094, 0.094)
     love.graphics.rectangle("fill", xPos,yPos, 400, 100)
 
-    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.setColor(0.141, 0.141, 0.141)
     love.graphics.rectangle("fill", xPos,yPos, 400, 30)
 
     love.graphics.setFont(fontBig)
-    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.setColor(1,1,1)
     love.graphics.print("Confirm", xPos + 160, yPos + 2)
 
-    love.graphics.setColor(1,1,1)
     love.graphics.print("Do you want to change the audio output?", xPos + 10, yPos + 50)
 
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos,yPos + 100, 400, 40)
+
     love.graphics.setColor(1,1,1)
-    love.graphics.print("A: Yes   B: No", xPos, yPos + 100)
+    love.graphics.draw(ic_A, xPos + 5, yPos + 107)
+    love.graphics.print("Yes", xPos + 5 + 30, yPos + 110)
+
+    love.graphics.draw(ic_B, xPos + 5 + 30 + 50, yPos + 107)
+    love.graphics.print("No", xPos + 5 + 30 + 50 + 30, yPos + 110)
 end
 
 -- Bluetooth
@@ -363,38 +396,25 @@ end
 -- Available Devices
 function AvailableDevicesUI()
     -- UI
-    local xPos = 0
-    local yPos = 30
-    local width = 320
-    local height = 370
+    local xPos = 8
+    local yPos = 48 + 8
+    local width = 308
+    local height = 319
 
-    love.graphics.setColor(0.102, 0.141, 0.078)
-    love.graphics.rectangle("fill", xPos, yPos, width, height)
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.094, 0.094, 0.094)
+    love.graphics.rectangle("fill", xPos, yPos, width, height, 8,8)
 
     -- Header
-    if isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
-    else love.graphics.setColor(0.247, 0.278, 0.224)
-    end
-
-    love.graphics.rectangle("fill", xPos, yPos, width, 30)
-
+    love.graphics.setColor(0.141, 0.141, 0.141)
+    love.graphics.rectangle("fill", xPos, yPos, width, 40, 8, 8)
     love.graphics.setColor(1,1,1)
     love.graphics.print("Available", xPos + 120, yPos + 7)
 
-    local lineHeight = 15
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
+    love.graphics.setColor(0.094, 0.094, 0.094)
+    love.graphics.rectangle("fill", xPos, yPos + 35, width, 240)
 
-    love.graphics.setColor(0.169, 0.259, 0.212)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 40, 30)
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
-
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 40, 30)
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("Name", xPos + 130, yPos + 30  + 7)
-
+    local lineHeight = 35
     local total = table.getn(availableDevices)
     local idxStart = currAvailableDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
     local idxEnd = currAvailableDevicePage * Config.GRID_PAGE_ITEM
@@ -405,17 +425,33 @@ function AvailableDevicesUI()
 
         if isAvailableDevicesSelected and iPos + 1 == idxAvailableDevices then
             love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
+            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 40, width, 35, 4,4)
             love.graphics.setColor(1,1,1)
         end
 
         love.graphics.setColor(1,1,1)
-        love.graphics.print(availableDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
-        love.graphics.print(availableDevices[idx].name, xPos + 130, iPos * lineHeight + yPos + 65)
+        love.graphics.setFont(fontBoldSmall)
+        love.graphics.print(availableDevices[idx].name, xPos + 10, iPos * lineHeight + yPos + 40 + 7)
+
+        love.graphics.setColor(1,1,1, 0.5)
+        love.graphics.setFont(fontBoldSmallest)
+        love.graphics.print(availableDevices[idx].ip, xPos + 210, iPos * lineHeight + yPos + 40 + 15)
 
         iPos = iPos + 1
     end
 
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos, yPos + height - 30, width, 40, 8,8)
+    love.graphics.rectangle("fill", xPos, yPos + height - 30, width, 20)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.draw(ic_A, xPos + 5, yPos + height - 22)
+    love.graphics.print("Connect", xPos + 33, yPos + height - 20)
+
+    love.graphics.draw(ic_Y, xPos + 100, yPos + height - 22)
+    love.graphics.print("Scan", xPos + 100 + 30, yPos + height - 20)
+    
     love.graphics.setColor(1,1,1)
 end
 
@@ -437,20 +473,18 @@ end
 -- Connected Devices
 function ConnectedDevicesUI()
     -- UI
-    local xPos = 320
-    local yPos = 30
-    local width = 320
-    local height = 370
+    local xPos = 320 + 4
+    local yPos = 48 + 8
+    local width = 308
+    local height = 319
 
-    love.graphics.setColor(0.114, 0.149, 0.094)
-    love.graphics.rectangle("fill", xPos, yPos, width, height, 5, 5, 10)
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.094, 0.094, 0.094)
+    love.graphics.rectangle("fill", xPos, yPos, width, height, 8,8)
 
     -- Header
-    if not isAvailableDevicesSelected then love.graphics.setColor(1,1,1, 0.4)
-    else love.graphics.setColor(0.247, 0.278, 0.224)
-    end
-
-    love.graphics.rectangle("fill", xPos, yPos, width, 30)
+    love.graphics.setColor(0.141, 0.141, 0.141)
+    love.graphics.rectangle("fill", xPos, yPos, width, 40, 8, 8)
 
     love.graphics.setColor(1,1,1)
     if isAvailableDevicesSelected then
@@ -468,19 +502,9 @@ function ConnectedDevicesUI()
 
     love.graphics.print(titleConnectedDevice, xPos + 120, yPos + 7)
 
-    local lineHeight = 15
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width, 30)
-
-    love.graphics.setColor(0.169, 0.259, 0.212)
-    love.graphics.rectangle("fill", xPos, yPos + 30, width / 2 - 40, 30)
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("MAC", xPos + 10, yPos + 30 + 7)
-
-    love.graphics.setColor(0.169, 0.259, 0.11)
-    love.graphics.rectangle("fill", xPos + width / 2, yPos + 30, width / 2 + 40, 30)
-    love.graphics.setColor(1,1,1)
-    love.graphics.print("Name", xPos + 130, yPos + 30  + 7)
+    local lineHeight = 35
+    love.graphics.setColor(0.094, 0.094, 0.094)
+    love.graphics.rectangle("fill", xPos, yPos + 35, width, 240)
 
     local total = table.getn(connectedDevices)
     local idxStart = currConnectedDevicePage * Config.GRID_PAGE_ITEM - Config.GRID_PAGE_ITEM + 1
@@ -492,24 +516,39 @@ function ConnectedDevicesUI()
 
         if not isAvailableDevicesSelected and iPos + 1 == idxConnectedDevice then
             love.graphics.setColor(0.435, 0.522, 0.478, 0.4)
-            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 65, width, 15)
+            love.graphics.rectangle("fill", xPos, iPos * lineHeight + yPos + 40, width, 35, 4,4)
             love.graphics.setColor(1,1,1)
         end
-
-        love.graphics.setColor(1,1,1)
-        love.graphics.print(connectedDevices[idx].ip, xPos + 10, iPos * lineHeight + yPos + 65)
 
         local deviceName = connectedDevices[idx].name
         if connectedDevices[idx].battery then
             deviceName = "[" .. connectedDevices[idx].battery .. "] " .. deviceName
         end
 
-        love.graphics.print(deviceName, xPos + 130, iPos * lineHeight + yPos + 65)
+        love.graphics.setColor(1,1,1)
+        love.graphics.setFont(fontBoldSmall)
+        love.graphics.print(deviceName, xPos + 10, iPos * lineHeight + yPos + 40 + 7)
+
+        love.graphics.setColor(1,1,1, 0.5)
+        love.graphics.setFont(fontBoldSmallest)
+        love.graphics.print(connectedDevices[idx].ip, xPos + 210, iPos * lineHeight + yPos + 40 + 15)
 
         iPos = iPos + 1
     end
 
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos, yPos + height - 30, width, 40, 8,8)
+    love.graphics.rectangle("fill", xPos, yPos + height - 30, width, 20)
+
     love.graphics.setColor(1,1,1)
+    if txtDisconnectRemoveBtn == "" then txtDisconnectRemoveBtn = "Disconnect" end
+    love.graphics.draw(ic_X, xPos + 5, yPos + height - 22)
+    love.graphics.print(txtDisconnectRemoveBtn, xPos + 33, yPos + height - 20)
+
+    love.graphics.draw(ic_ZL, xPos + 130, yPos + height - 22)
+    love.graphics.print("Audio", xPos + 130 + 30, yPos + height - 20)
+    
 end
 
 function LoadConnectedDevices()
@@ -543,25 +582,32 @@ function ShowQuitConfirmUI()
 
     local xPos = 140
     local yPos = 100
-
-    love.graphics.setColor(0,0,0, 0.5)
+    
+    love.graphics.setColor(0,0,0, 0.7)
     love.graphics.rectangle("fill", 0,0, 640, 480)
 
-    love.graphics.setColor(0.416, 0.439, 0.408)
+    love.graphics.setColor(0.094, 0.094, 0.094)
     love.graphics.rectangle("fill", xPos,yPos, 400, 100)
 
-    love.graphics.setColor(0.49, 0.502, 0.49)
+    love.graphics.setColor(0.141, 0.141, 0.141)
     love.graphics.rectangle("fill", xPos,yPos, 400, 30)
 
     love.graphics.setFont(fontBig)
-    love.graphics.setColor(0,0,0, 0.5)
+    love.graphics.setColor(1,1,1)
     love.graphics.print("Confirm", xPos + 160, yPos + 2)
 
-    love.graphics.setColor(1,1,1)
     love.graphics.print("Are you sure you want to exit?", xPos + 10, yPos + 50)
 
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos,yPos + 100, 400, 40)
+
     love.graphics.setColor(1,1,1)
-    love.graphics.print("A: Yes   B: No", xPos, yPos + 100)
+    love.graphics.draw(ic_A, xPos + 5, yPos + 107)
+    love.graphics.print("Yes", xPos + 5 + 30, yPos + 110)
+
+    love.graphics.draw(ic_B, xPos + 5 + 30 + 50, yPos + 107)
+    love.graphics.print("No", xPos + 5 + 30 + 50 + 30, yPos + 110)
 end
 
 -- Love
@@ -569,6 +615,9 @@ end
 function love.load()
     fontBig = love.graphics.newFont(Config.FONT_PATH, 17)
     fontSmall = love.graphics.newFont(Config.FONT_PATH, 12)
+    fontBold = love.graphics.newFont(Config.FONT_BOLD_PATH, 20)
+    fontBoldSmall = love.graphics.newFont(Config.FONT_BOLD_PATH, 14)
+    fontBoldSmallest = love.graphics.newFont(Config.FONT_BOLD_PATH, 10)
 
     isBluetoothOn = Bluetooth.IsPowerOn()
     if isBluetoothOn then
@@ -585,25 +634,37 @@ function love.load()
     end
 
     ic_bluetooth = love.graphics.newImage("Assets/Icon/ic_bluetooth.png")
+    ic_bluetooth_big = love.graphics.newImage("Assets/Icon/ic_bluetooth_big.png")
+    ic_plus = love.graphics.newImage("Assets/Icon/Plus.png")
+    ic_minus = love.graphics.newImage("Assets/Icon/Minus.png")
+    ic_A = love.graphics.newImage("Assets/Icon/Xbox A.png")
+    ic_B = love.graphics.newImage("Assets/Icon/Xbox B.png")
+    ic_X = love.graphics.newImage("Assets/Icon/Xbox X.png")
+    ic_Y = love.graphics.newImage("Assets/Icon/Xbox Y.png")
+    ic_ZL = love.graphics.newImage("Assets/Icon/Zl Button.png")
+
+    ic_off = love.graphics.newImage("Assets/Icon/off.png")
+    ic_on = love.graphics.newImage("Assets/Icon/on.png")
 end
 
 function love.draw()
-    love.graphics.setBackgroundColor(0.043, 0.161, 0.094)
+    love.graphics.setBackgroundColor(0.071, 0.071, 0.071)
 
     HeaderUI()
+
+    love.graphics.setFont(fontBoldSmall)
 
     if isBluetoothOn then
         AvailableDevicesUI()
         ConnectedDevicesUI()
     else
-        love.graphics.print("Press [Start] to Power On Bluetooth", 200, 200)
+        love.graphics.draw(ic_bluetooth_big, 640/2 - 60, 480/2 - 100)
+        love.graphics.print("Press", 220, 253)
+        love.graphics.draw(ic_plus, 220 + 40, 250)
+        love.graphics.print("to turn on Bluetooth", 260 + 30, 253)
     end
 
     BottomButtonUI()
-
-    -- Log MSG
-    love.graphics.rectangle("line", 370, 430, 260, 40)
-    love.graphics.print(msgLog, 380, 442)
 
     ScanTimeoutSelectionUI()
     AudioSelectionUI()

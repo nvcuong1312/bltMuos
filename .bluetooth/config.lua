@@ -16,12 +16,13 @@ Config.AUDIO_SINKS = "data/sinks.txt"
 Config.BLUETOOTH_EXPECT_PATH = "bin/bluetooth_expect_script.exp"
 
 -- Grid
-Config.GRID_PAGE_ITEM = 20
+Config.GRID_PAGE_ITEM = 7
 
 --
-Config.TIMEOUT_LIST = {"10", "15", "3", "5", "20", "25"}
+Config.TIMEOUT_LIST = {"10", "15", "20", "25", "5"}
 
 -- Font
 Config.FONT_PATH = "Assets/Font/Font.ttf"
+Config.FONT_BOLD_PATH = "Assets/Font/Font-Bold.ttf"
 
 return Config
