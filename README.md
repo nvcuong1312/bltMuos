@@ -28,3 +28,13 @@ If you find this project helpful and want to support my work, you can donate via
 Your support is greatly appreciated! 🚀  
 
 Let me know if you need any modifications! 😊
+
+### 💖 Thanks:
+- [xonglebongle](https://github.com/xonglebongle)
+- [duncanyoyo1](https://github.com/duncanyoyo1)
+- [bgelmini](https://github.com/bgelmini)
+- roasty
+- [oiimrosabel](https://github.com/oiimrosabel)
+- [ngencokamin](https://github.com/ngencokamin)
+- [Doronimmo](https://github.com/Doronimmo)
+- [chronoss0109](https://github.com/chronoss09)
