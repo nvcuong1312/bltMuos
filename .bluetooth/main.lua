@@ -305,8 +305,21 @@ function AutopairDevice()
 	end
 	
 	local pos = (currConnectedDevicePage - 1) * Config.GRID_PAGE_ITEM + idxConnectedDevice
-        local MAC = connectedDevices[pos].ip
-	local result = Bluetooth.ToggleAutopair(MAC)
+    local MAC = connectedDevices[pos].ip
+    local name = connectedDevices[pos].name
+
+    -- see if there is audio information
+    -- if so, a line will be added to switch audio device
+    local tempAudioList = Audio.Sinks()
+    local sinkId
+    for idx,item in ipairs(tempAudioList) do
+        if StringHelper.Trim(item.name) == StringHelper.Trim(name) then
+            sinkId = tempAudioList[idx].id
+            break
+        end
+    end
+
+	local result = Bluetooth.ToggleAutopair(MAC,sinkId)
 	-- result: autopair added
 	if result == true then
 		msgLog = "Autopair set!"

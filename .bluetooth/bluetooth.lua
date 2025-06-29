@@ -168,29 +168,34 @@ end
 
 -- AUTOPAIR FUNCTIONALITY
 -- returns: true if the device has been configured for startup, false if removed
-function Bluetooth.ToggleAutopair(deviceMAC)
+function Bluetooth.ToggleAutopair(deviceMAC,sinkId)
 	local file = io.open(Config.BLUETOOTH_STARTUP_PATH)
 	if file then
 		for line in file:lines() do
 			if string.find(line,deviceMAC) then
 				file:close()
-				Bluetooth.AutopairRemove(deviceMAC)
+				Bluetooth.AutopairRemove(deviceMAC,sinkId)
 				return false
 			end
 		end
 	end
-	Bluetooth.Autopair(deviceMAC)
+	Bluetooth.Autopair(deviceMAC,sinkId)
 	return true
 end
 
-function Bluetooth.Autopair(deviceMAC)
+function Bluetooth.Autopair(deviceMAC,sinkId)
 	os.execute("echo \"bluetoothctl connect " .. deviceMAC .. "\" >> " .. Config.BLUETOOTH_STARTUP_PATH)
+    if sinkId then
+        os.execute("echo 'wpctl set-default \"" .. sinkId .. "\"' >> " .. Config.BLUETOOTH_STARTUP_PATH)
+    end
 end
 
-function Bluetooth.AutopairRemove(deviceMAC)
-	local rmstr = "bluetoothctl connect " .. deviceMAC
+-- TODO: introduces conflicts when there are multiple autopair audios configured
+function Bluetooth.AutopairRemove(deviceMAC,sinkId)
 	os.execute("grep -v \"" .. deviceMAC .. "\" " .. Config.BLUETOOTH_STARTUP_PATH .. " > tmpfile && mv tmpfile " .. Config.BLUETOOTH_STARTUP_PATH)
-	local file = io.open
+    if sinkId then 
+        os.execute("grep -v \"wpctl set-default\" " .. Config.BLUETOOTH_STARTUP_PATH .. " > tmpfile && mv tmpfile " .. Config.BLUETOOTH_STARTUP_PATH)
+    end
 end
 
 function Bluetooth.GetBatteryPercent()
