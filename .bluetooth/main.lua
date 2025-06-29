@@ -299,6 +299,35 @@ function TurnOffBluetooth()
     end
 end
 
+function AutopairDevice()
+	if isAvailableDevicesSelected then
+		return
+	end
+	
+	local pos = (currConnectedDevicePage - 1) * Config.GRID_PAGE_ITEM + idxConnectedDevice
+    local MAC = connectedDevices[pos].ip
+    local name = connectedDevices[pos].name
+
+    -- see if there is audio information
+    -- if so, a line will be added to switch audio device
+    local tempAudioList = Audio.Sinks()
+    local sinkId
+    for idx,item in ipairs(tempAudioList) do
+        if StringHelper.Trim(item.name) == StringHelper.Trim(name) then
+            sinkId = tempAudioList[idx].id
+            break
+        end
+    end
+
+	local result = Bluetooth.ToggleAutopair(MAC,sinkId)
+	-- result: autopair added
+	if result == true then
+		msgLog = "Autopair set!"
+	else
+		msgLog = "Autopair removed!"
+	end
+end
+
 function ConnectDevice()
     if (    isAvailableDevicesSelected and table.getn(availableDevices) < 1)
         or (not isAvailableDevicesSelected
@@ -553,6 +582,8 @@ function ConnectedDevicesUI()
     love.graphics.draw(ic_L1, xPos + 130, yPos + height - 22)
     love.graphics.print("Audio", xPos + 130 + 30, yPos + height - 20)
     
+    -- Autopair button
+    love.graphics.print("R1-Autopair", xPos + 130 + 80, yPos + height - 20)
 end
 
 function LoadConnectedDevices()
@@ -866,6 +897,11 @@ function love.gamepadpressed(joystick, button)
             if key == "x" then
                 DisconnectDevice()
                 return
+            end
+            
+            if key == "r1" then
+            	AutopairDevice()
+            	return
             end
 
             if key == "up" then
