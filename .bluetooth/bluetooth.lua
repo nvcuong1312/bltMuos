@@ -186,6 +186,9 @@ end
 function Bluetooth.Autopair(deviceMAC,sinkId)
 	os.execute("echo \"bluetoothctl connect " .. deviceMAC .. "\" >> " .. Config.BLUETOOTH_STARTUP_PATH)
     if sinkId then
+        -- first remove all other audio sets
+        os.execute("grep -v \"wpctl set-default\" " .. Config.BLUETOOTH_STARTUP_PATH .. " > tmpfile && mv tmpfile " .. Config.BLUETOOTH_STARTUP_PATH)
+        -- now add the new one
         os.execute("echo 'wpctl set-default \"" .. sinkId .. "\"' >> " .. Config.BLUETOOTH_STARTUP_PATH)
     end
 end
