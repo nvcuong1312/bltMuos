@@ -166,6 +166,33 @@ function Bluetooth.Pair(deviceMAC)
     os.execute("bluetoothctl pair " .. deviceMAC)
 end
 
+-- AUTOPAIR FUNCTIONALITY
+-- returns: true if the device has been configured for startup, false if removed
+function Bluetooth.ToggleAutopair(deviceMAC)
+	local file = io.open(Config.BLUETOOTH_STARTUP_PATH)
+	if file then
+		for line in file:lines() do
+			if string.find(line,deviceMAC) then
+				file:close()
+				Bluetooth.AutopairRemove(deviceMAC)
+				return false
+			end
+		end
+	end
+	Bluetooth.Autopair(deviceMAC)
+	return true
+end
+
+function Bluetooth.Autopair(deviceMAC)
+	os.execute("echo \"bluetoothctl connect " .. deviceMAC .. "\" >> " .. Config.BLUETOOTH_STARTUP_PATH)
+end
+
+function Bluetooth.AutopairRemove(deviceMAC)
+	local rmstr = "bluetoothctl connect " .. deviceMAC
+	os.execute("grep -v \"" .. deviceMAC .. "\" " .. Config.BLUETOOTH_STARTUP_PATH .. " > tmpfile && mv tmpfile " .. Config.BLUETOOTH_STARTUP_PATH)
+	local file = io.open
+end
+
 function Bluetooth.GetBatteryPercent()
     for _,device in ipairs(connectedDevices) do
         if device.type == Bluetooth.ConnectedType.CONNECTED then

@@ -14,6 +14,7 @@ Config.AUDIO_SINK_NUMBER = "data/sinknumber.txt"
 Config.AUDIO_SINKS = "data/sinks.txt"
 
 Config.BLUETOOTH_EXPECT_PATH = "bin/bluetooth_expect_script.exp"
+Config.BLUETOOTH_STARTUP_PATH = "/mnt/mmc/MUOS/init/bluetooth.sh"
 
 -- Grid
 Config.GRID_PAGE_ITEM = 7
