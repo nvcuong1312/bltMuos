@@ -34,7 +34,8 @@ local timeRunDisConnectFunc = 0
 local ic_bluetooth
 local ic_bluetooth_big
 local ic_plus, ic_minus
-local ic_A, ic_B, ic_X, ic_Y, ic_ZL
+local ic_select, ic_start
+local ic_A, ic_B, ic_X, ic_Y, ic_ZL, ic_L1
 local ic_off, ic_on
 
 local isTimeoutShow = false
@@ -91,16 +92,19 @@ function BottomButtonUI()
     love.graphics.rectangle("fill", xPos, yPos, 680, 45)
     
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(ic_minus, xPos + 5, yPos + 10)
-    love.graphics.print("Off", xPos + 5 + 30, yPos + 13)
+    love.graphics.draw(ic_select, xPos + 5, yPos + 15)
+    love.graphics.print("Off", xPos + 5 + 40, yPos + 13)
     if isBluetoothOn then
         love.graphics.draw(ic_on, xPos + 5 + 30 + 40, yPos + 7)
     else
         love.graphics.draw(ic_off, xPos + 5 + 30 + 40, yPos + 7)
     end
 
-    love.graphics.draw(ic_plus, xPos + 5 + 30 + 40 + 80, yPos + 10)
-    love.graphics.print("On",  xPos + 5 + 30 + 40 + 80 + 30, yPos + 13)
+    love.graphics.draw(ic_start, xPos + 5 + 40 + 25 + 80, yPos + 15)
+    love.graphics.print("On",  xPos + 5 + 40 + 25 + 80 + 40, yPos + 13)
+
+    love.graphics.draw(ic_B, 640 - 66, yPos + 10)
+    love.graphics.print("Quit", 640 - 40, yPos + 13)
 end
 
 -- Scan
@@ -548,7 +552,7 @@ function ConnectedDevicesUI()
     love.graphics.draw(ic_X, xPos + 5, yPos + height - 22)
     love.graphics.print(txtDisconnectRemoveBtn, xPos + 33, yPos + height - 20)
 
-    love.graphics.draw(ic_ZL, xPos + 130, yPos + height - 22)
+    love.graphics.draw(ic_L1, xPos + 130, yPos + height - 22)
     love.graphics.print("Audio", xPos + 130 + 30, yPos + height - 20)
     
 end
@@ -676,11 +680,15 @@ function love.load()
     ic_bluetooth_big = love.graphics.newImage("Assets/Icon/ic_bluetooth_big.png")
     ic_plus = love.graphics.newImage("Assets/Icon/Plus.png")
     ic_minus = love.graphics.newImage("Assets/Icon/Minus.png")
+    ic_select = love.graphics.newImage("Assets/Icon/Select.png")
+    ic_start = love.graphics.newImage("Assets/Icon/Start.png")
     ic_A = love.graphics.newImage("Assets/Icon/Xbox A.png")
     ic_B = love.graphics.newImage("Assets/Icon/Xbox B.png")
     ic_X = love.graphics.newImage("Assets/Icon/Xbox X.png")
     ic_Y = love.graphics.newImage("Assets/Icon/Xbox Y.png")
     ic_ZL = love.graphics.newImage("Assets/Icon/Zl Button.png")
+    ic_L1 = love.graphics.newImage("Assets/Icon/L1.png")
+
 
     ic_off = love.graphics.newImage("Assets/Icon/off.png")
     ic_on = love.graphics.newImage("Assets/Icon/on.png")
@@ -699,8 +707,8 @@ function love.draw()
     else
         love.graphics.draw(ic_bluetooth_big, 640/2 - 60, 480/2 - 100)
         love.graphics.print("Press", 220, 253)
-        love.graphics.draw(ic_plus, 220 + 40, 250)
-        love.graphics.print("to turn on Bluetooth", 260 + 30, 253)
+        love.graphics.draw(ic_start, 220 + 40, 255)
+        love.graphics.print("to turn on Bluetooth", 260 + 40, 253)
     end
 
     BottomButtonUI()
