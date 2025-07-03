@@ -48,6 +48,8 @@ local isSwitchAudioShow = false
 
 local isQuitConfirm = false
 
+local isConnectMethodSelection = false
+
 local fontBig
 local fontSmall
 local fontBold
@@ -295,7 +297,7 @@ function TurnOffBluetooth()
     end
 end
 
-function ConnectDevice()
+function ConnectDevice(isExpectMethod)
     if (    isAvailableDevicesSelected and table.getn(availableDevices) < 1)
         or (not isAvailableDevicesSelected
             and itemSelectedType ~= Bluetooth.ConnectedType.PAIRED
@@ -312,7 +314,7 @@ function ConnectDevice()
             local pos = (currAvailableDevicePage - 1) * Config.GRID_PAGE_ITEM + idxAvailableDevices
             MAC = availableDevices[pos].ip
             name = availableDevices[pos].name
-            Bluetooth.Connect(MAC)
+            Bluetooth.Connect(MAC, isExpectMethod)
             connectedDevices = Bluetooth.GetConnectedDevices()
 
             local tempDevices = availableDevices
@@ -610,6 +612,43 @@ function ShowQuitConfirmUI()
     love.graphics.print("No", xPos + 5 + 30 + 50 + 30, yPos + 110)
 end
 
+-- Connect method
+function ConnectMethodSelectionUI()
+    if not isConnectMethodSelection then return end
+
+    local xPos = 140
+    local yPos = 100
+    
+    love.graphics.setColor(0,0,0, 0.7)
+    love.graphics.rectangle("fill", 0,0, 640, 480)
+
+    love.graphics.setColor(0.094, 0.094, 0.094)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 100)
+
+    love.graphics.setColor(0.141, 0.141, 0.141)
+    love.graphics.rectangle("fill", xPos,yPos, 400, 30)
+
+    love.graphics.setFont(fontBig)
+    love.graphics.setColor(1,1,1)
+    love.graphics.print("Method", xPos + 160, yPos + 2)
+
+    love.graphics.print("Choose a connection method", xPos + 10, yPos + 50)
+
+    love.graphics.setFont(fontBoldSmall)
+    love.graphics.setColor(0.125, 0.125, 0.125)
+    love.graphics.rectangle("fill", xPos,yPos + 100, 400, 40)
+
+    love.graphics.setColor(1,1,1)
+    love.graphics.draw(ic_A, xPos + 5, yPos + 107)
+    love.graphics.print("Expect", xPos + 5 + 30, yPos + 110)
+
+    love.graphics.draw(ic_Y, xPos + 105, yPos + 107)
+    love.graphics.print("None Expect", xPos + 135, yPos + 110)
+
+    love.graphics.draw(ic_B, xPos + 235, yPos + 107)
+    love.graphics.print("Close", xPos + 265, yPos + 110)
+end
+
 -- Love
 
 function love.load()
@@ -670,6 +709,7 @@ function love.draw()
     AudioSelectionUI()
     ConfirmAutoSwitchAudioUI()
     ShowQuitConfirmUI()
+    ConnectMethodSelectionUI()
 end
 
 function love.update(dt)
@@ -832,9 +872,27 @@ function love.gamepadpressed(joystick, button)
     end
 
     if isBluetoothOn then
+        if isConnectMethodSelection then
+            if key == "a" then
+                ConnectDevice(true)
+                return
+            end
+
+            if key == "y" then
+                ConnectDevice(false)
+                return
+            end
+
+            if key == "b" then
+                isConnectMethodSelection = false
+                return
+            end
+
+            return
+        end
         if isAvailableDevicesSelected then
             if key == "a" then
-                ConnectDevice()
+                isConnectMethodSelection = true
                 return
             end
 
@@ -851,7 +909,7 @@ function love.gamepadpressed(joystick, button)
 
         if not isAvailableDevicesSelected then
             if key == "a" then
-                ConnectDevice()
+                ConnectDevice(false)
                 return
             end
 

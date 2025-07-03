@@ -153,13 +153,15 @@ function Bluetooth.Remove(deviceMAC)
     os.execute("bluetoothctl remove " .. deviceMAC)
 end
 
-function Bluetooth.Connect(deviceMAC)
-    -- os.execute("bluetoothctl trust " .. deviceMAC .. " > " .. Config.BLUETOOTH_TRUST_PATH)
-    -- os.execute("bluetoothctl pair " .. deviceMAC .. " > " .. Config.BLUETOOTH_PAIR_PATH)
-    -- os.execute("bluetoothctl connect " .. deviceMAC .. " > " .. Config.BLUETOOTH_CONNECT_PATH)
-
-    local command = string.format("expect %s %s > %s", Config.BLUETOOTH_EXPECT_PATH, deviceMAC, Config.BLUETOOTH_CONNECT_PATH)
-    os.execute(command)
+function Bluetooth.Connect(deviceMAC, isExpectMethod)
+    if isExpectMethod == nil then
+        local command = string.format("expect %s %s > %s", Config.BLUETOOTH_EXPECT_PATH, deviceMAC, Config.BLUETOOTH_CONNECT_PATH)
+        os.execute(command)
+    else
+        os.execute("bluetoothctl trust " .. deviceMAC .. " > " .. Config.BLUETOOTH_TRUST_PATH)
+        os.execute("bluetoothctl pair " .. deviceMAC .. " > " .. Config.BLUETOOTH_PAIR_PATH)
+        os.execute("bluetoothctl connect " .. deviceMAC .. " > " .. Config.BLUETOOTH_CONNECT_PATH)
+    end
 end
 
 function Bluetooth.Pair(deviceMAC)
