@@ -882,11 +882,13 @@ function love.gamepadpressed(joystick, button)
     if isBluetoothOn then
         if isConnectMethodSelection then
             if key == "a" then
+                isConnectMethodSelection = false
                 ConnectDevice(true)
                 return
             end
 
             if key == "y" then
+                isConnectMethodSelection = false
                 ConnectDevice(false)
                 return
             end
@@ -917,7 +919,7 @@ function love.gamepadpressed(joystick, button)
 
         if not isAvailableDevicesSelected then
             if key == "a" then
-                ConnectDevice(false)
+                isConnectMethodSelection = true
                 return
             end
 
