@@ -154,7 +154,7 @@ function Bluetooth.Remove(deviceMAC)
 end
 
 function Bluetooth.Connect(deviceMAC, isExpectMethod)
-    if isExpectMethod == nil then
+    if isExpectMethod then
         local command = string.format("expect %s %s > %s", Config.BLUETOOTH_EXPECT_PATH, deviceMAC, Config.BLUETOOTH_CONNECT_PATH)
         os.execute(command)
     else
