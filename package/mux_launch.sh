@@ -49,9 +49,9 @@ START_INTERFACE() {
 }
 
 # Execute Bluetooth function stuff
-LOAD_MODULE
-START_BLUETOOTH
-START_INTERFACE
+# LOAD_MODULE
+# START_BLUETOOTH
+# START_INTERFACE
 
 # Launcher
 cd "$LOVEDIR" || exit

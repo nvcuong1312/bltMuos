@@ -32,6 +32,11 @@ function Bluetooth.IsPowerOn()
     return false
 end
 
+function Bluetooth.RetryTurnOnPower()
+    os.execute("rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5")
+    Bluetooth.PowerOn()
+end
+
 function Bluetooth.PowerOn()
     os.execute("bluetoothctl power on")
 end
