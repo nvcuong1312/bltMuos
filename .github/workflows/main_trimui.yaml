@@ -25,7 +25,7 @@ jobs:
             cp -r .bluetooth/* build/mnt/mmc/MUOS/application/Bluetooth
             cp .bluetooth/bin/bluetooth_trimui.sh build/run/muos/storage/init
             cp package/mux_launch_trimui.sh build/mnt/mmc/MUOS/application/Bluetooth/mux_launch.sh
-            cp package/root/* /
+            cp package/root/* build/
             cp package/update_trimui.sh build/opt/update.sh
         - name: Package muxupd
           run: |
