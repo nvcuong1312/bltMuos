@@ -1,0 +1,40 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  package:
+    name: Package for MUOS - TrimUI
+    runs-on: ubuntu-latest
+    steps:
+        - name: Check out repo
+          uses: actions/checkout@v2
+        - name:  Create muxupd directory
+          run: mkdir -p build
+        - name: Create muxupd structure
+          run: |
+            mkdir -p build/mnt/mmc/MUOS/application/Bluetooth
+            mkdir -p build/opt/muos/default/MUOS/theme/active/glyph/muxapp
+            mkdir -p build/run/muos/storage/init
+        - name: Move files to muxupd tree
+          run: |
+            cp -r .bluetooth/* build/mnt/mmc/MUOS/application/Bluetooth
+            cp .bluetooth/bin/bluetooth_trimui.sh build/run/muos/storage/init
+            cp package/mux_launch_trimui.sh build/mnt/mmc/MUOS/application/Bluetooth/mux_launch.sh
+            cp package/root/* /
+            cp package/update_trimui.sh build/opt/update.sh
+        - name: Package muxupd
+          run: |
+            cd build
+            zip -r Bluetooth-Install-Full-CANADA-GOOSE-TRIMUI.zip .
+            mv Bluetooth-Install-Full-CANADA-GOOSE-TRIMUI.zip Bluetooth-Install-Full-CANADA-GOOSE-TRIMUI.muxupd
+        - name: Upload artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: MUOS Bluetooth Canada Goose Installer
+            path: |
+              build/Bluetooth-Install-Full-CANADA-GOOSE-TRIMUI.muxupd
