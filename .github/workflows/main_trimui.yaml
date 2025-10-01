@@ -27,9 +27,10 @@ jobs:
             rm build/mnt/mmc/MUOS/application/Bluetooth/bluetooth.lua
             mv build/mnt/mmc/MUOS/application/Bluetooth/main_trimui.lua build/mnt/mmc/MUOS/application/Bluetooth/main.lua
             mv build/mnt/mmc/MUOS/application/Bluetooth/bluetooth_trimui.lua build/mnt/mmc/MUOS/application/Bluetooth/bluetooth.lua
-            cp .bluetooth/bin/bluetooth_trimui.sh build/run/muos/storage/init
+            cp .bluetooth/bin/bluetooth_trimui.sh build/run/muos/storage/init/bluetooth.sh
             cp package/mux_launch_trimui.sh build/mnt/mmc/MUOS/application/Bluetooth/mux_launch.sh
             cp -r package/root/* build/
+            cp -r package/expect/* build/
             cp package/update_trimui.sh build/opt/update.sh
         - name: Package muxupd
           run: |

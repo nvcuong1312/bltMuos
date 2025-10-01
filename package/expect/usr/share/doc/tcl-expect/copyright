@@ -1,0 +1,15 @@
+Author: Don Libes <libes@cme.nist.gov>
+Download: http://sourceforge.net/projects/expect/
+
+Files: *
+Copyright: (C) 1987-2002 National Institute of Standards and Technology <http://www.nist.gov/>
+License: PD
+ Design and implementation of this program was paid for by U.S. tax
+ dollars. Therefore it is public domain. However, the author and NIST
+ would appreciate credit if this program or parts of it are used.
+
+Files: debian/*
+Copyright: (C) 2006-2008 Daniel Baumann <daniel@debian.org>
+License: PD
+ The Debian packaging is hereby placed in the public domain (no rights
+ reserved).
