@@ -23,6 +23,10 @@ jobs:
         - name: Move files to muxupd tree
           run: |
             cp -r .bluetooth/* build/mnt/mmc/MUOS/application/Bluetooth
+            rm build/mnt/mmc/MUOS/application/Bluetooth/main.lua
+            rm build/mnt/mmc/MUOS/application/Bluetooth/bluetooth.lua
+            mv build/mnt/mmc/MUOS/application/Bluetooth/main_trimui.lua build/mnt/mmc/MUOS/application/Bluetooth/main.lua
+            mv build/mnt/mmc/MUOS/application/Bluetooth/bluetooth_trimui.lua build/mnt/mmc/MUOS/application/Bluetooth/bluetooth.lua
             cp .bluetooth/bin/bluetooth_trimui.sh build/run/muos/storage/init
             cp package/mux_launch_trimui.sh build/mnt/mmc/MUOS/application/Bluetooth/mux_launch.sh
             cp -r package/root/* build/
