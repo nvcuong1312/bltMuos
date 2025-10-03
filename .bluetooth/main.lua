@@ -287,6 +287,7 @@ function TurnOnBluetooth()
     if isBluetoothOn then
         msgLog = "Bluetooth: Started"
     else
+        msgLog = "Retry turning on Bluetooth"
         Bluetooth.RetryTurnOnPower()
         isBluetoothOn = Bluetooth.IsPowerOn()
         if isBluetoothOn then

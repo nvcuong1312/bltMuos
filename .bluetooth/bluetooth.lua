@@ -33,7 +33,19 @@ function Bluetooth.IsPowerOn()
 end
 
 function Bluetooth.RetryTurnOnPower()
-    os.execute("rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5")
+    os.execute("killall rtk_hciattach")
+    os.execute("killall bluetoothd")
+    socket.sleep(0.5)
+
+    os.execute("rtk_hciattach -n -s 115200 /dev/ttyS1 rtk_h5 >/dev/null 2>&1 &")
+    socket.sleep(3)
+
+    os.execute("hciconfig hci0 up")
+    socket.sleep(1)
+
+    os.execute("/usr/libexec/bluetooth/bluetoothd -n -d > /mnt/mmc/MUOS/log/bluetoothd.log 2>&1 &")
+    socket.sleep(2)
+    
     Bluetooth.PowerOn()
 end
 
