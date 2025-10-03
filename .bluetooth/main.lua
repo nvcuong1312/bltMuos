@@ -57,6 +57,8 @@ local fontBold
 local fontBoldSmall
 local fontBoldSmallest
 
+local _screenW, _screenH = love.window.getDesktopDimensions()
+
 function HeaderUI()
     local xPos = 0
     local yPos = 0
@@ -702,6 +704,12 @@ function love.load()
 end
 
 function love.draw()
+
+    local scaleX = _screenW / 640
+    local scaleY = _screenH / 480
+    love.graphics.push()
+    love.graphics.scale(scaleX, scaleY)
+
     love.graphics.setBackgroundColor(0.071, 0.071, 0.071)
 
     HeaderUI()
@@ -725,6 +733,8 @@ function love.draw()
     ConfirmAutoSwitchAudioUI()
     ShowQuitConfirmUI()
     ConnectMethodSelectionUI()
+
+    love.graphics.pop()
 end
 
 function love.update(dt)

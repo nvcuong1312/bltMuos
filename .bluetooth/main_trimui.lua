@@ -35,7 +35,7 @@ local ic_bluetooth
 local ic_bluetooth_big
 local ic_plus, ic_minus
 local ic_select, ic_start
-local ic_A, ic_B, ic_X, ic_Y, ic_ZL, ic_L1
+local ic_A, ic_B, ic_X, ic_Y, ic_ZL, ic_L1, ic_R1
 local ic_off, ic_on
 
 local isTimeoutShow = false
@@ -56,6 +56,8 @@ local fontSmall
 local fontBold
 local fontBoldSmall
 local fontBoldSmallest
+
+local _screenW, _screenH = love.window.getDesktopDimensions()
 
 function HeaderUI()
     local xPos = 0
@@ -92,16 +94,16 @@ function BottomButtonUI()
     love.graphics.rectangle("fill", xPos, yPos, 680, 45)
     
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(ic_select, xPos + 5, yPos + 15)
-    love.graphics.print("Off", xPos + 5 + 40, yPos + 13)
-    if isBluetoothOn then
-        love.graphics.draw(ic_on, xPos + 5 + 30 + 40, yPos + 7)
-    else
-        love.graphics.draw(ic_off, xPos + 5 + 30 + 40, yPos + 7)
-    end
+    -- love.graphics.draw(ic_select, xPos + 5, yPos + 15)
+    -- love.graphics.print("Off", xPos + 5 + 40, yPos + 13)
+    -- if isBluetoothOn then
+    --     love.graphics.draw(ic_on, xPos + 5 + 30 + 40, yPos + 7)
+    -- else
+    --     love.graphics.draw(ic_off, xPos + 5 + 30 + 40, yPos + 7)
+    -- end
 
-    love.graphics.draw(ic_start, xPos + 5 + 40 + 25 + 80, yPos + 15)
-    love.graphics.print("On",  xPos + 5 + 40 + 25 + 80 + 40, yPos + 13)
+    -- love.graphics.draw(ic_start, xPos + 5 + 40 + 25 + 80, yPos + 15)
+    -- love.graphics.print("On",  xPos + 5 + 40 + 25 + 80 + 40, yPos + 13)
 
     love.graphics.draw(ic_B, 640 - 66, yPos + 10)
     love.graphics.print("Quit", 640 - 40, yPos + 13)
@@ -695,6 +697,8 @@ function love.load()
     ic_Y = love.graphics.newImage("Assets/Icon/Xbox Y.png")
     ic_ZL = love.graphics.newImage("Assets/Icon/Zl Button.png")
     ic_L1 = love.graphics.newImage("Assets/Icon/L1.png")
+    ic_R1 = love.graphics.newImage("Assets/Icon/R1.png")
+    
 
 
     ic_off = love.graphics.newImage("Assets/Icon/off.png")
@@ -702,6 +706,12 @@ function love.load()
 end
 
 function love.draw()
+
+    local scaleX = _screenW / 640
+    local scaleY = _screenH / 480
+    love.graphics.push()
+    love.graphics.scale(scaleX, scaleY)
+
     love.graphics.setBackgroundColor(0.071, 0.071, 0.071)
 
     HeaderUI()
@@ -714,8 +724,8 @@ function love.draw()
     else
         love.graphics.draw(ic_bluetooth_big, 640/2 - 60, 480/2 - 100)
         love.graphics.print("Press", 220, 253)
-        love.graphics.draw(ic_start, 220 + 40, 255)
-        love.graphics.print("to turn on Bluetooth", 260 + 40, 253)
+        love.graphics.draw(ic_R1, 220 + 40, 255)
+        love.graphics.print("to turn on Bluetooth", 260 + 27, 253)
     end
 
     BottomButtonUI()
@@ -725,6 +735,8 @@ function love.draw()
     ConfirmAutoSwitchAudioUI()
     ShowQuitConfirmUI()
     ConnectMethodSelectionUI()
+
+    love.graphics.pop()
 end
 
 function love.update(dt)
