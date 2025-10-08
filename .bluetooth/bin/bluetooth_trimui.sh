@@ -26,6 +26,17 @@ start_hci()
 	}
 }
 
+setup_persistent_storage()
+{
+    # Clean up old symlink(s)
+    find /var/lib/bluetooth -name ??:??:??:??:??:?? -type l -exec unlink {} \;
+    bdaddr=`hciconfig hci0 | awk '/BD Address/ {print $3}'`
+    # Make sure the persistent storage directory exists
+    mkdir -p /var/lib/bluetooth/persistent_storage
+    # Create link with current random address and then bluetoothd can start using it
+    ln -sf persistent_storage "/var/lib/bluetooth/$bdaddr"
+}
+
 start_bluetooth()
 {
     /usr/libexec/bluetooth/bluetoothd -n -d > /mnt/mmc/MUOS/log/bluetoothd.log 2>&1 &
@@ -49,4 +60,5 @@ start_bluetooth()
 
 start_hci_attach
 start_hci
+setup_persistent_storage
 start_bluetooth
