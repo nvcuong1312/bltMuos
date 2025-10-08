@@ -5,21 +5,27 @@
 
 . /opt/muos/script/var/func.sh
 
-echo app >/tmp/ACT_GO
+echo app >/tmp/act_go
+
+GOV_GO="/tmp/gov_go"
+[ -e "$GOV_GO" ] && cat "$GOV_GO" >"$(GET_VAR "device" "cpu/governor")"
+
+SETUP_SDL_ENVIRONMENT
 
 LOVEDIR="$(GET_VAR "device" "storage/rom/mount")/MUOS/application/Bluetooth"
-GPTOKEYB="$(GET_VAR "device" "storage/rom/mount")/MUOS/emulator/gptokeyb/gptokeyb2.armhf"
+
+PM_DIR="$(GET_VAR "device" "storage/rom/mount")/MUOS/PortMaster"
+GPTOKEYB="${PM_DIR}/gptokeyb2"
 BINDIR="$LOVEDIR/bin"
 
-SDL_GAMECONTROLLERCONFIG_FILE="/usr/lib/gamecontrollerdb.txt"
 LD_LIBRARY_PATH="$BINDIR/libs.aarch64:$LD_LIBRARY_PATH"
-export SDL_GAMECONTROLLERCONFIG_FILE LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
 
 # Launcher
 cd "$LOVEDIR" || exit
-SET_VAR "SYSTEM" "FOREGROUND_PROCESS" "love"
+SET_VAR "system" "foreground_process" "love"
 
 # Run Application
-"love" &
+"${GPTOKEYB}" "$BINDIR/love" &
 "$BINDIR/love" .
 kill -9 "$(pidof gptokeyb2)" 2>/dev/null

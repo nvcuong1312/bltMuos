@@ -724,8 +724,8 @@ function love.draw()
     else
         love.graphics.draw(ic_bluetooth_big, 640/2 - 60, 480/2 - 100)
         love.graphics.print("Press", 220, 253)
-        love.graphics.draw(ic_R1, 220 + 40, 255)
-        love.graphics.print("to turn on Bluetooth", 260 + 27, 253)
+        love.graphics.draw(ic_select, 220 + 40, 255)
+        love.graphics.print("to turn on Bluetooth", 260 + 40, 253)
     end
 
     BottomButtonUI()
@@ -765,14 +765,6 @@ function love.update(dt)
     end
 end
 
-function love.keypressed(key)
-    if key == "l" then
-        key = "l1"
-    end
-
-    OnKeyPress(key)
-end
-
 function love.gamepadpressed(joystick, button)
     local key = ""
     if button == "dpleft" then
@@ -787,33 +779,30 @@ function love.gamepadpressed(joystick, button)
     if button == "dpdown" then
         key = "down"
     end
-    if button == "rightshoulder" then
+    if button == "a" then
         key = "a"
     end
-    if button == "leftshoulder" then
+    if button == "b" then
         key = "b"
     end
-    if button == "start" then
+    if button == "x" then
         key = "x"
     end
-    if button == "back" then
+    if button == "y" then
         key = "y"
     end
-    -- if button == "back" then
-        -- key = "select"
-    -- end
-    -- if button == "start" then
-        -- key = "start"
-    -- end
     if button == "guide" then
-        key = "l1"
+        key = "select"
     end
-    if button == "leftstick" then
+    if button == "start" then
         key = "start"
     end
-    -- if button == "guide" then
-        -- key = "guide"
-    -- end
+    if button == "leftshoulder" then
+        key = "l1"
+    end
+    if button == "rightshoulder" then
+        key = "r1"
+    end
 
     OnKeyPress(key)
  end
@@ -967,7 +956,7 @@ function love.gamepadpressed(joystick, button)
         end
     end
     else
-        if key == "start" then
+        if key == "select" then
             TurnOnBluetooth()
             return
         end
