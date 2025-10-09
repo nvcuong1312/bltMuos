@@ -38,3 +38,4 @@ Let me know if you need any modifications! 😊
 - [ngencokamin](https://github.com/ngencokamin)
 - [Doronimmo](https://github.com/Doronimmo)
 - [chronoss0109](https://github.com/chronoss09)
+- [palotaiz87](https://github.com/palotaiz87)
