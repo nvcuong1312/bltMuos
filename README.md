@@ -1,3 +1,6 @@
+## The application will switch to read-only mode because muOS now officially supports Bluetooth.
+
+
 ## Bluetooth for muOS
 
 A simple tool to manage Bluetooth connections on gaming devices running **muOS**, allowing you to easily connect and control Bluetooth devices.  
